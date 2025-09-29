@@ -19,21 +19,20 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"qiuzijian7.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":false,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="UE5Coro协程插件深度技术解析概述UE5Coro是一个为虚幻引擎5设计的现代C++20协程插件，它将标准库的协程功能无缝集成到UE5的游戏循环和蓝图系统中。本文将深入分析其核心实现机制、Promise系统设计以及与虚幻引擎的深度集成方式。 1. 核心实现机制1.1 TCoroutine协程类型系统UE5Coro的核心是TCoroutine&lt;T&gt;模板类，它提供了类型安全的协程句柄：">
+    <meta name="description" content="UE5Coro协程插件深度技术解析概述UE5Coro是一个为虚幻引擎5设计的现代C++20协程插件，它将标准库的协程功能无缝集成到UE5的游戏循环和蓝图系统中。本文将深入分析其核心实现机制、Promise系统设计以及与虚幻引擎的深度集成方式。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="UE5Coro协程插件深度技术解析">
 <meta property="og:url" content="https://qiuzijian7.github.io/2025/09/29/ue5coro_analysis/index.html">
 <meta property="og:site_name" content="Bugmaker&#39;s Blog">
-<meta property="og:description" content="UE5Coro协程插件深度技术解析概述UE5Coro是一个为虚幻引擎5设计的现代C++20协程插件，它将标准库的协程功能无缝集成到UE5的游戏循环和蓝图系统中。本文将深入分析其核心实现机制、Promise系统设计以及与虚幻引擎的深度集成方式。 1. 核心实现机制1.1 TCoroutine协程类型系统UE5Coro的核心是TCoroutine&lt;T&gt;模板类，它提供了类型安全的协程句柄：">
+<meta property="og:description" content="UE5Coro协程插件深度技术解析概述UE5Coro是一个为虚幻引擎5设计的现代C++20协程插件，它将标准库的协程功能无缝集成到UE5的游戏循环和蓝图系统中。本文将深入分析其核心实现机制、Promise系统设计以及与虚幻引擎的深度集成方式。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-09-29T09:00:00.000Z">
-<meta property="article:modified_time" content="2025-09-29T10:00:43.350Z">
+<meta property="article:modified_time" content="2025-09-29T10:23:39.947Z">
 <meta property="article:author" content="bugmaker">
 <meta property="article:tag" content="UE5">
 <meta property="article:tag" content="协程">
 <meta property="article:tag" content="C++">
 <meta property="article:tag" content="异步编程">
-<meta property="article:tag" content="源码分析">
 <meta name="twitter:card" content="summary">
 
 
@@ -212,18 +211,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">1</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -291,7 +290,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2025-09-29 17:00:00 / 修改时间：18:00:43" itemprop="dateCreated datePublished" datetime="2025-09-29T17:00:00+08:00">2025-09-29</time>
+      <time title="创建时间：2025-09-29 17:00:00 / 修改时间：18:23:39" itemprop="dateCreated datePublished" datetime="2025-09-29T17:00:00+08:00">2025-09-29</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -324,6 +323,8 @@
     
     
     <div class="post-body" itemprop="articleBody"><h1 id="UE5Coro协程插件深度技术解析"><a href="#UE5Coro协程插件深度技术解析" class="headerlink" title="UE5Coro协程插件深度技术解析"></a>UE5Coro协程插件深度技术解析</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>UE5Coro是一个为虚幻引擎5设计的现代C++20协程插件，它将标准库的协程功能无缝集成到UE5的游戏循环和蓝图系统中。本文将深入分析其核心实现机制、Promise系统设计以及与虚幻引擎的深度集成方式。</p>
+<span id="more"></span>
+
 <h2 id="1-核心实现机制"><a href="#1-核心实现机制" class="headerlink" title="1. 核心实现机制"></a>1. 核心实现机制</h2><h3 id="1-1-TCoroutine协程类型系统"><a href="#1-1-TCoroutine协程类型系统" class="headerlink" title="1.1 TCoroutine协程类型系统"></a>1.1 TCoroutine协程类型系统</h3><p>UE5Coro的核心是<code>TCoroutine&lt;T&gt;</code>模板类，它提供了类型安全的协程句柄：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 核心协程类型定义</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T = <span class="type">void</span>&gt;</span><br><span class="line"><span class="keyword">class</span> TCoroutine;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 基础协程类型（无返回值）</span></span><br><span class="line"><span class="keyword">template</span>&lt;&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UE5CORO_API</span> TCoroutine&lt;&gt;</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    std::shared_ptr&lt;Private::FPromiseExtras&gt; Extras;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">/** 请求协程在下一个机会停止执行 */</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Cancel</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** 阻塞等待协程完成 */</span></span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">Wait</span><span class="params">(uint32 WaitTimeMilliseconds = std::numeric_limits&lt;uint32&gt;::max(),</span></span></span><br><span class="line"><span class="params"><span class="function">              <span class="type">bool</span> bIgnoreThreadIdleStats = <span class="literal">false</span>)</span> <span class="type">const</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** 返回协程是否已完成 */</span></span><br><span class="line">    [[nodiscard]] <span class="function"><span class="type">bool</span> <span class="title">IsDone</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** 返回协程是否成功完成 */</span></span><br><span class="line">    [[nodiscard]] <span class="function"><span class="type">bool</span> <span class="title">WasSuccessful</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** 协程完成时调用提供的函数 */</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">ContinueWith</span><span class="params">(std::invocable <span class="keyword">auto</span> Fn)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 带返回值的协程类型</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TCoroutine</span> : <span class="keyword">public</span> TCoroutine&lt;&gt;</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">using</span> FResultType = T;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** 等待协程完成并获取结果 */</span></span><br><span class="line">    [[nodiscard]] <span class="function"><span class="type">const</span> T&amp; <span class="title">GetResult</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** 等待协程完成并移动结果 */</span></span><br><span class="line">    [[nodiscard]] <span class="function">T&amp;&amp; <span class="title">MoveResult</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
@@ -471,7 +472,6 @@ if (typeof NexT !== 'undefined' && NexT.utils) {
               <a href="/tags/%E5%8D%8F%E7%A8%8B/" rel="tag"># 协程</a>
               <a href="/tags/C/" rel="tag"># C++</a>
               <a href="/tags/%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B/" rel="tag"># 异步编程</a>
-              <a href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="tag"># 源码分析</a>
           </div>
 
         
