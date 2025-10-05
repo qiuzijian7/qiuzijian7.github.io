@@ -283,7 +283,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2025-10-05 10:00:00 / Modified: 10:21:06" itemprop="dateCreated datePublished" datetime="2025-10-05T10:00:00+08:00">2025-10-05</time>
+      <time title="Created: 2025-10-05 10:00:00 / Modified: 10:23:22" itemprop="dateCreated datePublished" datetime="2025-10-05T10:00:00+08:00">2025-10-05</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -310,101 +310,14 @@
     
     <div class="post-body" itemprop="articleBody">
           <h1 id="Option-Greeks-Explained-with-Practical-Use-Cases"><a href="#Option-Greeks-Explained-with-Practical-Use-Cases" class="headerlink" title="Option Greeks Explained with Practical Use Cases"></a>Option Greeks Explained with Practical Use Cases</h1><p>This article explains the Greek letters (Greeks) used in options pricing, their intuition, typical use cases, and concise examples. Assumptions: the underlying is a stock or index, volatility is annualized, and time is in years. Buying options refers to long positions and selling options refers to short positions.</p>
-<h2 id="I-Core-Greeks"><a href="#I-Core-Greeks" class="headerlink" title="I. Core Greeks"></a>I. Core Greeks</h2><h3 id="Delta-Δ"><a href="#Delta-Δ" class="headerlink" title="Delta (Δ)"></a>Delta (Δ)</h3><ul>
-<li>Meaning: Sensitivity of the option price to the underlying price. If the underlying moves by 1 unit, the option price changes by approximately Δ units.</li>
-<li>Intuition: Call Δ ∈ [0, 1]; Put Δ ∈ [-1, 0]. ATM ≈ ±0.5; deep ITM approaches ±1; deep OTM approaches 0.</li>
-<li>Usage:<ul>
-<li>Hedge exposure: Total Delta ≈ option Δ × contracts × contract multiplier (e.g., 100). To be Delta neutral, hedge with the underlying.</li>
-<li>Directional substitute: Use options to achieve equivalent stock exposure (e.g., target 300-share exposure → buy total Δ ≈ 300).</li>
-</ul>
-</li>
-<li>Example: Underlying 100 → 101; a call with Δ &#x3D; 0.4; holding 5 contracts (×100 shares) yields P&#x2F;L ≈ 0.4 × 5 × 100 &#x3D; 200 (ignoring other Greeks).</li>
-</ul>
-<h3 id="Gamma-Γ"><a href="#Gamma-Γ" class="headerlink" title="Gamma (Γ)"></a>Gamma (Γ)</h3><ul>
-<li>Meaning: Sensitivity of Delta to the underlying price. If the underlying moves by 1 unit, Delta changes by Γ.</li>
-<li>Intuition: ATM Gamma is largest; nearer expiry Gamma is sharper. Long Gamma (long options) tends to “go with the trend,” short Gamma (short options) tends to be “against the move.”</li>
-<li>Usage:<ul>
-<li>Gamma scalping: Buy near-term ATM options (long Gamma) and dynamically hedge with the underlying to harvest cash flow from volatility and offset Theta decay.</li>
-<li>Risk alert: Short near-term options during large moves require frequent re-hedging; losses can accelerate.</li>
-</ul>
-</li>
-<li>Example: A near-term ATM call with Γ &#x3D; 0.05; underlying 100 → 102; Delta roughly 0.5 → 0.6 (increase ≈ 2 × 0.05).</li>
-</ul>
-<h3 id="Theta-Θ"><a href="#Theta-Θ" class="headerlink" title="Theta (Θ)"></a>Theta (Θ)</h3><ul>
-<li>Meaning: Time decay of option value. Typically negative for buyers; the option loses Θ per day.</li>
-<li>Intuition: Closer to expiry and ATM options have larger Theta (buyers “bleed” faster). Sellers benefit from the passage of time.</li>
-<li>Usage:<ul>
-<li>Earn time decay: Sell spreads or iron condors (defined risk) to collect Theta.</li>
-<li>Offset time decay: Use Gamma scalping or event-driven volatility realization to compensate for Theta.</li>
-</ul>
-</li>
-<li>Example: ATM call Θ &#x3D; -0.02&#x2F;day; holding 10 contracts (×100 shares) daily decay ≈ 0.02 × 10 × 100 &#x3D; 20; if intraday hedging earns 30, net +10.</li>
-</ul>
-<h3 id="Vega-ν"><a href="#Vega-ν" class="headerlink" title="Vega (ν)"></a>Vega (ν)</h3><ul>
-<li>Meaning: Sensitivity of the option price to implied volatility (IV). If IV rises by 1 percentage point, price changes by approximately Vega × 0.01.</li>
-<li>Intuition: Longer expiries and ATM options have larger Vega. Buyers benefit from rising IV (long Vega); sellers benefit from falling IV (short Vega).</li>
-<li>Usage:<ul>
-<li>Pre&#x2F;post-event: Before earnings, be long Vega (straddles&#x2F;strangles). After earnings, IV often collapses—consider switching to short Vega structures.</li>
-<li>Pure vol trading: If you expect IV to rise → go long Vega; if you expect IV to fall → go short Vega (e.g., calendar spreads).</li>
-</ul>
-</li>
-<li>Example: Vega &#x3D; 0.12; IV 20% → 25%, per-unit change ≈ 0.12 × 0.05 &#x3D; 0.006; 10 contracts (×100 shares) ≈ +6 (Vega contribution only).</li>
-</ul>
-<h3 id="Rho-ρ"><a href="#Rho-ρ" class="headerlink" title="Rho (ρ)"></a>Rho (ρ)</h3><ul>
-<li>Meaning: Sensitivity of the option price to interest rates. For equity options, when rates rise 1%, calls increase and puts decrease.</li>
-<li>Intuition: Longer expiries show more Rho impact; overall effect is often modest, but watch it during tightening&#x2F;easing cycles and on LEAPS.</li>
-<li>Usage:<ul>
-<li>Long-term allocation: LEAPS calls benefit more from rising rates.</li>
-<li>Cross-asset pricing: In FX&#x2F;commodities, Rho interacts with carry&#x2F;convenience yield in pricing.</li>
-</ul>
-</li>
-<li>Example: LEAPS call ρ &#x3D; 0.4; rates 2% → 3%, change ≈ 0.4 × 0.01 &#x3D; 0.004 per unit.</li>
-</ul>
-<h2 id="II-Extended-or-Second-Order-Greeks"><a href="#II-Extended-or-Second-Order-Greeks" class="headerlink" title="II. Extended or Second-Order Greeks"></a>II. Extended or Second-Order Greeks</h2><ul>
-<li>Vomma (Volga): Sensitivity of Vega to IV. As IV rises quickly at longer expiries, Vega increases faster—long Vega positions can accelerate gains.</li>
-<li>Vanna: Sensitivity of Delta to IV (or Vega to the underlying price). Common in FX&#x2F;commodities for hedging the volatility smile.</li>
-<li>Charm (Delta Decay): Change of Delta over time. Near expiry, short positions may need more frequent re-hedging.</li>
-</ul>
-<h2 id="III-Common-Strategies-and-Scenarios"><a href="#III-Common-Strategies-and-Scenarios" class="headerlink" title="III. Common Strategies and Scenarios"></a>III. Common Strategies and Scenarios</h2><h3 id="Scenario-1-Delta-neutral-volatility-bet-long-Gamma-long-Vega"><a href="#Scenario-1-Delta-neutral-volatility-bet-long-Gamma-long-Vega" class="headerlink" title="Scenario 1: Delta-neutral volatility bet (long Gamma&#x2F;long Vega)"></a>Scenario 1: Delta-neutral volatility bet (long Gamma&#x2F;long Vega)</h3><ul>
-<li>Action: Buy near-term ATM straddle (call + put). Initial Δ ≈ 0, Γ &gt; 0, ν &gt; 0, Θ &lt; 0.</li>
-<li>Goal: Large underlying moves or IV rising; use dynamic hedging (“buy low, sell high”) to offset Theta.</li>
-<li>Risk: If the underlying is stagnant and IV does not rise, Theta losses persist.</li>
-</ul>
-<h3 id="Scenario-2-Harvest-time-value-short-Theta-short-Vega-defined-risk"><a href="#Scenario-2-Harvest-time-value-short-Theta-short-Vega-defined-risk" class="headerlink" title="Scenario 2: Harvest time value (short Theta&#x2F;short Vega, defined risk)"></a>Scenario 2: Harvest time value (short Theta&#x2F;short Vega, defined risk)</h3><ul>
-<li>Action: Sell spreads or iron condors; structure caps maximum loss.</li>
-<li>Goal: Range-bound underlying, IV contraction, and time passing deliver profits.</li>
-<li>Risk: Directional breakouts or IV spikes can cause losses; use stop-losses and protective legs.</li>
-</ul>
-<h3 id="Scenario-3-Directional-expression-and-leverage-control-using-Delta-and-Gamma"><a href="#Scenario-3-Directional-expression-and-leverage-control-using-Delta-and-Gamma" class="headerlink" title="Scenario 3: Directional expression and leverage control (using Delta and Gamma)"></a>Scenario 3: Directional expression and leverage control (using Delta and Gamma)</h3><ul>
-<li>Action: For bullish views, buy slightly OTM calls (initial Δ ≈ 0.3–0.4). If price rallies quickly, Γ pushes Δ toward 1, accelerating gains.</li>
-<li>Risk: If the move disappoints, Θ decay and IV drop (negative ν) can hit P&#x2F;L from both sides.</li>
-</ul>
-<h3 id="Scenario-4-Pre-post-event-volatility-trading-using-Vega"><a href="#Scenario-4-Pre-post-event-volatility-trading-using-Vega" class="headerlink" title="Scenario 4: Pre&#x2F;post-event volatility trading (using Vega)"></a>Scenario 4: Pre&#x2F;post-event volatility trading (using Vega)</h3><ul>
-<li>Action: Be long Vega (straddles&#x2F;strangles) before earnings; after the event, IV often collapses—close or flip to short Vega.</li>
-<li>Example: IV 30% → 45% pre-event yields profits; after the event, IV drops to 25%—failing to close may give back gains.</li>
-</ul>
-<h3 id="Scenario-5-Long-expiry-and-interest-rates-using-Rho"><a href="#Scenario-5-Long-expiry-and-interest-rates-using-Rho" class="headerlink" title="Scenario 5: Long expiry and interest rates (using Rho)"></a>Scenario 5: Long expiry and interest rates (using Rho)</h3><ul>
-<li>Action: With rate-hike expectations, prefer LEAPS calls or reduce put exposure.</li>
-<li>Risk: Rate path vs. market expectations may offset price moves.</li>
-</ul>
-<h2 id="IV-Consolidated-Numerical-Example-simplified"><a href="#IV-Consolidated-Numerical-Example-simplified" class="headerlink" title="IV. Consolidated Numerical Example (simplified)"></a>IV. Consolidated Numerical Example (simplified)</h2><ul>
-<li>Let S &#x3D; 100; a near-term ATM straddle (same expiry call + put). Per-leg approximations:<ul>
-<li>Call Δ ≈ +0.5, Put Δ ≈ -0.5 → combined Δ ≈ 0</li>
-<li>Γ ≈ 0.08 per leg → combined Γ ≈ 0.16</li>
-<li>Θ ≈ -0.03&#x2F;day per leg → combined Θ ≈ -0.06&#x2F;day</li>
-<li>ν ≈ 0.10 per leg → combined ν ≈ 0.20</li>
-</ul>
-</li>
-<li>If the daily range is ±3, dynamic hedging can produce cumulative cash flow ≈ 0.6–1.2 per unit (path&#x2F;execution dependent), covering part or all daily Θ. If IV rises by 5 percentage points simultaneously, Vega adds ≈ 0.20 × 0.05 &#x3D; 0.01 per unit, boosting net gains.</li>
-</ul>
-<h2 id="V-Practice-Tips-and-Risk-Control"><a href="#V-Practice-Tips-and-Risk-Control" class="headerlink" title="V. Practice Tips and Risk Control"></a>V. Practice Tips and Risk Control</h2><ul>
-<li>Greeks are dynamic: Expiry, moneyness, IV, and price all change them.</li>
-<li>Prefer defined-risk structures for short positions: Spreads and iron condors; avoid naked shorts to mitigate tail risk.</li>
-<li>Buyers must watch time and IV: If price stalls or IV declines, Θ and negative ν erode P&#x2F;L.</li>
-<li>Keep discipline in dynamic hedging: Set rebalancing thresholds (e.g., Δ change of 0.1 or price change of x%) to avoid overtrading.</li>
-</ul>
-<p>If you want a tradable structure and Greek estimates tailored to your underlying, expiry, and IV, provide the ticker, expiry date, strike range, and your view (bullish&#x2F;bearish&#x2F;volatility).</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/10/05/greeks-options.en/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
