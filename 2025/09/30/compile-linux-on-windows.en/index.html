@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"qiuzijian7.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":false,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Complete Guide to Compiling UE5 Linux Projects on WindowsOverviewDuring UE5 development, developers frequently encounter Linux platform compilation errors. This article provides a comprehensive local">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Complete Guide to Compiling UE5 Linux Projects on Windows">
+<meta property="og:url" content="https://qiuzijian7.github.io/2025/09/30/compile-linux-on-windows.en/index.html">
+<meta property="og:site_name" content="Bugmaker&#39;s Blog">
+<meta property="og:description" content="Complete Guide to Compiling UE5 Linux Projects on WindowsOverviewDuring UE5 development, developers frequently encounter Linux platform compilation errors. This article provides a comprehensive local">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://qiuzijian7.github.io/images/dev-requirements.webp">
+<meta property="og:image" content="https://qiuzijian7.github.io/images/cross-compile-toolchain.webp">
+<meta property="og:image" content="https://qiuzijian7.github.io/images/linux_multiarch_root.webp">
+<meta property="og:image" content="https://qiuzijian7.github.io/images/setting.webp">
+<meta property="article:published_time" content="2025-09-30T02:00:00.000Z">
+<meta property="article:modified_time" content="2025-10-05T01:22:48.000Z">
+<meta property="article:author" content="bugmaker">
+<meta property="article:tag" content="UE5">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Cross-Compilation">
+<meta property="article:tag" content="Clang">
+<meta property="article:tag" content="Cross-Platform">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://qiuzijian7.github.io/images/dev-requirements.webp">
+
+
+<link rel="canonical" href="https://qiuzijian7.github.io/2025/09/30/compile-linux-on-windows.en/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://qiuzijian7.github.io/2025/09/30/compile-linux-on-windows.en/","path":"2025/09/30/compile-linux-on-windows.en/","title":"Complete Guide to Compiling UE5 Linux Projects on Windows"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Complete Guide to Compiling UE5 Linux Projects on Windows | Bugmaker's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<!-- 自定义语言切换器样式 -->
+<style>
+.language-switcher {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 5px 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  backdrop-filter: blur(10px);
+}
+
+.language-switcher a {
+  color: #333;
+  text-decoration: none;
+  padding: 5px 8px;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.language-switcher a:hover {
+  background: #007acc;
+  color: white;
+}
+
+.language-switcher a.active {
+  background: #007acc;
+  color: white;
+}
+
+.language-switcher .separator {
+  color: #ccc;
+  margin: 0 3px;
+}
+
+/* 暗色模式适配 */
+.dark-mode .language-switcher {
+  background: rgba(0, 0, 0, 0.8);
+  border-color: #444;
+}
+
+.dark-mode .language-switcher a {
+  color: #fff;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .language-switcher {
+    top: 10px;
+    right: 10px;
+    padding: 3px 8px;
+  }
+  
+  .language-switcher a {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+}
+</style>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Bugmaker's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">分享技术，记录成长<br>Sharing Technology, Recording Growth</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Complete-Guide-to-Compiling-UE5-Linux-Projects-on-Windows"><span class="nav-number">1.</span> <span class="nav-text">Complete Guide to Compiling UE5 Linux Projects on Windows</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Overview"><span class="nav-number">1.1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Background"><span class="nav-number">1.2.</span> <span class="nav-text">Background</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#System-Requirements"><span class="nav-number">1.3.</span> <span class="nav-text">System Requirements</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#UE5-3-Linux-Development-Requirements"><span class="nav-number">1.3.1.</span> <span class="nav-text">UE5.3 Linux Development Requirements</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Supported-Compiler-Versions"><span class="nav-number">1.3.2.</span> <span class="nav-text">Supported Compiler Versions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Detailed-Configuration-Steps"><span class="nav-number">1.4.</span> <span class="nav-text">Detailed Configuration Steps</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Step-1-Download-and-Install-Clang-Plugin"><span class="nav-number">1.4.1.</span> <span class="nav-text">Step 1: Download and Install Clang Plugin</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step-2-Environment-Variable-Configuration"><span class="nav-number">1.4.2.</span> <span class="nav-text">Step 2: Environment Variable Configuration</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step-3-Project-Configuration"><span class="nav-number">1.4.3.</span> <span class="nav-text">Step 3: Project Configuration</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step-4-Compilation-Configuration"><span class="nav-number">1.4.4.</span> <span class="nav-text">Step 4: Compilation Configuration</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Common-Issue-Resolution"><span class="nav-number">1.5.</span> <span class="nav-text">Common Issue Resolution</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Issue-1-Platform-Mismatch-Error"><span class="nav-number">1.5.1.</span> <span class="nav-text">Issue 1: Platform Mismatch Error</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Issue-2-Compiler-Not-Found"><span class="nav-number">1.5.2.</span> <span class="nav-text">Issue 2: Compiler Not Found</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Issue-3-Linking-Errors"><span class="nav-number">1.5.3.</span> <span class="nav-text">Issue 3: Linking Errors</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Summary"><span class="nav-number">1.6.</span> <span class="nav-text">Summary</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference-Resources"><span class="nav-number">1.7.</span> <span class="nav-text">Reference Resources</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="bugmaker"
+      src="/images/person.webp">
+  <p class="site-author-name" itemprop="name">bugmaker</p>
+  <div class="site-description" itemprop="description">  一个专注于技术分享和个人成长的博客，涵盖UE、游戏设计、AI等内容<br>A blog focused on tech sharing and personal growth, covering UE, game design, AI, and more.</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/qiuzijian7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;qiuzijian7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:919868412@qq.com" title="E-Mail → mailto:919868412@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/bugmaker-24" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;bugmaker-24" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i>知乎</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://qiuzijian7.github.io/2025/09/30/compile-linux-on-windows.en/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/person.webp">
+      <meta itemprop="name" content="bugmaker">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Bugmaker's Blog">
+      <meta itemprop="description" content="  一个专注于技术分享和个人成长的博客，涵盖UE、游戏设计、AI等内容<br>A blog focused on tech sharing and personal growth, covering UE, game design, AI, and more.">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Complete Guide to Compiling UE5 Linux Projects on Windows | Bugmaker's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Complete Guide to Compiling UE5 Linux Projects on Windows
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2025-09-30 10:00:00" itemprop="dateCreated datePublished" datetime="2025-09-30T10:00:00+08:00">2025-09-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-10-05 09:22:48" itemprop="dateModified" datetime="2025-10-05T09:22:48+08:00">2025-10-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/UE5/" itemprop="url" rel="index"><span itemprop="name">UE5</span></a>
+        </span>
+          , 
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/UE5/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+        </span>
+          , 
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/UE5/Linux/Compilation/" itemprop="url" rel="index"><span itemprop="name">Compilation</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="Complete-Guide-to-Compiling-UE5-Linux-Projects-on-Windows"><a href="#Complete-Guide-to-Compiling-UE5-Linux-Projects-on-Windows" class="headerlink" title="Complete Guide to Compiling UE5 Linux Projects on Windows"></a>Complete Guide to Compiling UE5 Linux Projects on Windows</h1><h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>During UE5 development, developers frequently encounter Linux platform compilation errors. This article provides a comprehensive local compilation solution to help developers successfully compile Linux versions of UE5 projects in a Windows environment.</p>
+<span id="more"></span>
+
+<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>With the release of UE5.3, Epic Games has made significant upgrades to the Linux development environment, including updates to the compiler toolchain. These changes require developers to reconfigure their development environment to ensure successful cross-platform compilation.</p>
+<h2 id="System-Requirements"><a href="#System-Requirements" class="headerlink" title="System Requirements"></a>System Requirements</h2><h3 id="UE5-3-Linux-Development-Requirements"><a href="#UE5-3-Linux-Development-Requirements" class="headerlink" title="UE5.3 Linux Development Requirements"></a>UE5.3 Linux Development Requirements</h3><p>UE5.3 has upgraded its compiler toolchain. For specific requirements, please refer to the official documentation:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.unrealengine.com/5.3/en-US/linux-development-requirements-for-unreal-engine/">UE5.3 Linux Development Requirements</a></li>
+</ul>
+<p><img src="/../images/dev-requirements.webp" alt="Development Requirements"></p>
+<h3 id="Supported-Compiler-Versions"><a href="#Supported-Compiler-Versions" class="headerlink" title="Supported Compiler Versions"></a>Supported Compiler Versions</h3><ul>
+<li><strong>Clang</strong>: Latest version recommended</li>
+<li><strong>GCC</strong>: Specific version range supported</li>
+<li><strong>Cross-compilation Toolchain</strong>: Official pre-compiled versions</li>
+</ul>
+<h2 id="Detailed-Configuration-Steps"><a href="#Detailed-Configuration-Steps" class="headerlink" title="Detailed Configuration Steps"></a>Detailed Configuration Steps</h2><h3 id="Step-1-Download-and-Install-Clang-Plugin"><a href="#Step-1-Download-and-Install-Clang-Plugin" class="headerlink" title="Step 1: Download and Install Clang Plugin"></a>Step 1: Download and Install Clang Plugin</h3><ol>
+<li><p><strong>Obtain Cross-compilation Toolchain</strong></p>
+<p>Visit the official documentation for the latest toolchain:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.unrealengine.com/5.1/en-US/linux-development-requirements-for-unreal-engine/">UE5.1 Linux Development Requirements</a></li>
+</ul>
+</li>
+<li><p><strong>Download Toolchain</strong></p>
+<p><img src="/../images/cross-compile-toolchain.webp" alt="Cross-compile Toolchain"></p>
+<ul>
+<li>Select the appropriate toolchain version for your system</li>
+<li>Download the complete cross-compilation environment</li>
+<li>Ensure you download the officially certified version</li>
+</ul>
+</li>
+<li><p><strong>Installation Process</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Extract toolchain to specified directory</span></span><br><span class="line"><span class="comment"># Usually installed to: C:\UnrealToolchains\</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="Step-2-Environment-Variable-Configuration"><a href="#Step-2-Environment-Variable-Configuration" class="headerlink" title="Step 2: Environment Variable Configuration"></a>Step 2: Environment Variable Configuration</h3><p><strong>Important Note</strong>: After setting environment variables, you must restart your computer for changes to take effect.</p>
+<ol>
+<li><p><strong>Set System Environment Variables</strong></p>
+<ul>
+<li>Add toolchain path to PATH</li>
+<li>Configure LINUX_MULTIARCH_ROOT variable</li>
+<li>Set compiler-related environment variables</li>
+</ul>
+</li>
+<li><p><strong>Verify Installation</strong></p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># <span class="built_in">Verify</span> clang installation</span><br><span class="line">clang --version</span><br><span class="line"></span><br><span class="line"># Check cross-compilation toolchain</span><br><span class="line">x86_64-unknown-linux-gnu-clang --version</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="Step-3-Project-Configuration"><a href="#Step-3-Project-Configuration" class="headerlink" title="Step 3: Project Configuration"></a>Step 3: Project Configuration</h3><ol>
+<li><p><strong>Regenerate Project Files</strong></p>
+<p>Execute in UE5 project root directory:</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Regenerate project files</span><br><span class="line">GenerateProjectFiles.bat</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Open Project and Select Platform</strong></p>
+<p><img src="/../images/linux_multiarch_root.webp" alt="Linux Multiarch Root"></p>
+<ul>
+<li>Open project in Visual Studio</li>
+<li>Select corresponding platform configuration</li>
+<li>Ensure Linux platform is available</li>
+</ul>
+</li>
+</ol>
+<h3 id="Step-4-Compilation-Configuration"><a href="#Step-4-Compilation-Configuration" class="headerlink" title="Step 4: Compilation Configuration"></a>Step 4: Compilation Configuration</h3><ol>
+<li><strong>Platform Selection</strong><ul>
+<li>Select “Development” or “Shipping” in solution configuration</li>
+<li>Select “Linux” for platform<br><img src="/../images/setting.webp" alt="setting"></li>
+</ul>
+</li>
+</ol>
+<h2 id="Common-Issue-Resolution"><a href="#Common-Issue-Resolution" class="headerlink" title="Common Issue Resolution"></a>Common Issue Resolution</h2><h3 id="Issue-1-Platform-Mismatch-Error"><a href="#Issue-1-Platform-Mismatch-Error" class="headerlink" title="Issue 1: Platform Mismatch Error"></a>Issue 1: Platform Mismatch Error</h3><p><strong>Symptoms</strong>: Platform mismatch or Linux toolchain not found</p>
+<p><strong>Solution</strong>:</p>
+<ol>
+<li>Close Visual Studio</li>
+<li>Confirm environment variables are set correctly</li>
+<li>Restart computer</li>
+<li>Reopen Visual Studio and project</li>
+</ol>
+<h3 id="Issue-2-Compiler-Not-Found"><a href="#Issue-2-Compiler-Not-Found" class="headerlink" title="Issue 2: Compiler Not Found"></a>Issue 2: Compiler Not Found</h3><p><strong>Symptoms</strong>: Compilation fails with clang or cross-compiler not found</p>
+<p><strong>Solution</strong>:</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># Check environment variables</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">%PATH%</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">%LINUX_MULTIARCH_ROOT%</span></span><br><span class="line"></span><br><span class="line"># <span class="built_in">Verify</span> toolchain installation</span><br><span class="line">where clang</span><br><span class="line">where x86_64-unknown-linux-gnu-clang</span><br></pre></td></tr></table></figure>
+
+<h3 id="Issue-3-Linking-Errors"><a href="#Issue-3-Linking-Errors" class="headerlink" title="Issue 3: Linking Errors"></a>Issue 3: Linking Errors</h3><p><strong>Symptoms</strong>: Compilation succeeds but linking fails</p>
+<p><strong>Solution</strong>:</p>
+<ol>
+<li>Check library file paths</li>
+<li>Confirm all dependency libraries have Linux versions</li>
+<li>Check third-party library compatibility</li>
+</ol>
+<h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><p>Following the above steps, you can successfully compile Linux versions of UE5 in a Windows environment. Key points include:</p>
+<ol>
+<li><strong>Correctly install cross-compilation toolchain</strong></li>
+<li><strong>Configure necessary environment variables and restart system</strong></li>
+<li><strong>Regenerate project files</strong></li>
+<li><strong>Select correct platform and configuration</strong></li>
+</ol>
+<p>When encountering issues, first check environment variable configuration, then verify toolchain installation, and finally confirm project configuration correctness.</p>
+<h2 id="Reference-Resources"><a href="#Reference-Resources" class="headerlink" title="Reference Resources"></a>Reference Resources</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.unrealengine.com/5.3/en-US/linux-development-requirements-for-unreal-engine/">UE5.3 Linux Development Requirements Official Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.unrealengine.com/5.1/en-US/linux-development-requirements-for-unreal-engine/">UE5.1 Linux Development Requirements</a></li>
+<li><a target="_blank" rel="noopener" href="https://forums.unrealengine.com/">Epic Games Official Forum Linux Development Discussion</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+<script>
+// 等待页面加载完成
+document.addEventListener('DOMContentLoaded', function() {
+  // 查找现有的 utterances 脚本并移除
+  const existingScript = document.querySelector('script[src*="utteranc.es"]');
+  if (existingScript) {
+    existingScript.remove();
+  }
+  
+  // 查找现有的 utterances 容器并清空
+  const existingContainer = document.querySelector('.utterances-container, #utterances-container');
+  if (existingContainer) {
+    existingContainer.innerHTML = '';
+  }
+  
+  // 创建或复用评论容器
+  let commentsContainer = document.querySelector('.utterances-container, #utterances-container');
+  if (!commentsContainer) {
+    commentsContainer = document.createElement('div');
+    commentsContainer.className = 'comments utterances-container';
+    commentsContainer.id = 'utterances-container';
+    
+    // 找到合适的位置插入评论容器
+    const postBody = document.querySelector('.post-body') || document.querySelector('.content');
+    if (postBody) {
+      postBody.appendChild(commentsContainer);
+    } else {
+      document.body.appendChild(commentsContainer);
+    }
+  }
+  
+  // 创建 utterances 脚本
+  const script = document.createElement('script');
+  script.src = 'https://utteranc.es/client.js';
+  script.setAttribute('repo', 'qiuzijian7/qiuzijian7.github.io');
+  
+  // 使用 article_id 作为 issue-term，如果没有则回退到 title
+  
+  script.setAttribute('issue-term', 'compile-linux-on-windows');
+  
+  
+  script.setAttribute('theme', 'github-light');
+  script.setAttribute('crossorigin', 'anonymous');
+  script.async = true;
+  
+  // 将脚本添加到容器中
+  commentsContainer.appendChild(script);
+});
+
+// 如果是 PJAX 环境，也需要在页面切换后重新加载评论
+if (typeof NexT !== 'undefined' && NexT.utils) {
+  document.addEventListener('page:loaded', function() {
+    // 延迟一点时间确保页面完全加载
+    setTimeout(function() {
+      const event = new Event('DOMContentLoaded');
+      document.dispatchEvent(event);
+    }, 100);
+  });
+}
+</script>
+
+          <div class="post-tags">
+              <a href="/tags/UE5/" rel="tag"># UE5</a>
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Cross-Compilation/" rel="tag"># Cross-Compilation</a>
+              <a href="/tags/Clang/" rel="tag"># Clang</a>
+              <a href="/tags/Cross-Platform/" rel="tag"># Cross-Platform</a>
+          </div>
+
+        
+
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+  <div class="languages">
+    <label class="lang-select-label">
+      <i class="fa fa-language"></i>
+      <span>简体中文</span>
+      <i class="fa fa-angle-up" aria-hidden="true"></i>
+    </label>
+    <select class="lang-select" data-canonical="" aria-label="Select language">
+      
+        <option value="zh-CN" data-href="/2025/09/30/compile-linux-on-windows.en/" selected="">
+          简体中文
+        </option>
+      
+        <option value="en" data-href="/en/2025/09/30/compile-linux-on-windows.en/" selected="">
+          English
+        </option>
+      
+    </select>
+  </div>
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">bugmaker</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<!-- 自定义语言切换器 -->
+<div class="language-switcher">
+  <a href="javascript:void(0)" onclick="switchLanguage('zh-CN')" id="lang-zh">中文</a>
+  <span class="separator">|</span>
+  <a href="javascript:void(0)" onclick="switchLanguage('en')" id="lang-en">EN</a>
+</div>
+
+<script>
+// 语言切换功能
+function switchLanguage(lang) {
+  const currentPath = window.location.pathname;
+  let newPath;
+  
+  console.log('Current path:', currentPath, 'Target lang:', lang);
+  // 保存用户选择的语言偏好
+  try { localStorage.setItem('language-preference', (lang === 'en') ? 'en' : 'zh-CN'); } catch (e) {}
+  
+  // 检测当前页面语言
+  const isCurrentlyEnglish = currentPath.includes('.en/') || currentPath.startsWith('/en/');
+  
+  if (lang === 'en') {
+    // 切换到英文
+    if (isCurrentlyEnglish) {
+      console.log('Already on English page');
+      return;
+    }
+    
+    if (currentPath === '/') {
+      // 首页：/ -> /en/
+      newPath = '/en/';
+    } else if (currentPath.match(/\/\d{4}\/\d{2}\/\d{2}\/[\w-]+\/$/)) {
+      // 文章页面：/2025/09/21/hello-world/ -> /2025/09/21/hello-world.en/
+      const articlePath = currentPath.slice(0, -1); // 移除末尾的 /
+      newPath = articlePath + '.en/';
+    } else if (currentPath.match(/^\/(about|tags|categories|archives)\//)) {
+      // 其他页面：/about/ -> /en/about/
+      newPath = '/en' + currentPath;
+    } else {
+      // 默认处理
+      newPath = '/en' + currentPath;
+    }
+  } else {
+    // 切换到中文
+    if (!isCurrentlyEnglish) {
+      console.log('Already on Chinese page');
+      return;
+    }
+    
+    if (currentPath === '/en/') {
+      // 英文首页：/en/ -> /
+      newPath = '/';
+    } else if (currentPath.match(/\/\d{4}\/\d{2}\/\d{2}\/[\w-]+\.en\/$/)) {
+      // 英文文章：/2025/09/21/hello-world.en/ -> /2025/09/21/hello-world/
+      newPath = currentPath.replace('.en/', '/');
+    } else if (currentPath.startsWith('/en/')) {
+      // 其他英文页面：/en/about/ -> /about/
+      newPath = currentPath.replace('/en', '');
+    }
+  }
+  
+  if (newPath) {
+    console.log('Switching from:', currentPath, 'to:', newPath);
+    // 直接跳转，不再检查页面存在性以避免延迟
+    window.location.href = newPath;
+  }
+}
+
+// 检测当前语言并高亮对应按钮
+function detectCurrentLanguage() {
+  const path = window.location.pathname;
+  // 修复语言检测逻辑
+  const isEnglish = path.includes('.en/') || path.startsWith('/en/');
+  
+  console.log('Detecting language for path:', path, 'isEnglish:', isEnglish);
+  
+  const zhBtn = document.getElementById('lang-zh');
+  const enBtn = document.getElementById('lang-en');
+  
+  if (zhBtn && enBtn) {
+    // 清除之前的状态
+    zhBtn.classList.remove('active');
+    enBtn.classList.remove('active');
+    
+    // 设置正确的状态
+    if (isEnglish) {
+      enBtn.classList.add('active');
+    } else {
+      zhBtn.classList.add('active');
+    }
+  }
+}
+
+// 检查并应用保存的语言偏好（不跳转，仅重写站内链接以保持语言一致）
+function applyLanguagePreference() {
+  let savedLanguage = null;
+  try { savedLanguage = localStorage.getItem('language-preference'); } catch (e) {}
+  if (savedLanguage) ensureLinksLanguage(savedLanguage);
+}
+
+// 统一将站内链接重写为指定语言版本（不触发跳转）
+// 规则：
+// - EN: / -> /en/；/about 等 => /en/about；文章路径 /YYYY/MM/DD/slug/ => 加 .en/
+// - ZH: /en/... => 去掉 /en 前缀；文章路径去掉 .en/
+function ensureLinksLanguage(lang) {
+  try {
+    var links = document.querySelectorAll('a[href]');
+    var origin = window.location.origin;
+    var articleZh = /^\/\d{4}\/\d{2}\/\d{2}\/[\w-]+\/$/;
+    var articleEn = /^\/\d{4}\/\d{2}\/\d{2}\/[\w-]+\.en\/$/;
+    var sections = /^(\/(about|tags|categories|archives)\/.*|\/(about|tags|categories|archives)\/?)$/;
+
+    links.forEach(function(a) {
+      var href = a.getAttribute('href');
+      if (!href) return;
+
+      // 仅处理同站内绝对路径链接
+      if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//')) return;
+      if (!href.startsWith('/')) return;
+
+      var newHref = href;
+
+      if (lang === 'en') {
+        if (href === '/') {
+          newHref = '/en/';
+        } else if (href.startsWith('/en/')) {
+          // 已经是英文
+          newHref = href;
+        } else if (articleZh.test(href)) {
+          // 文章：/..../slug/ -> /..../slug.en/
+          newHref = href.slice(0, -1) + '.en/';
+        } else if (sections.test(href)) {
+          // 章节页：/about -> /en/about
+          newHref = '/en' + (href.startsWith('/') ? href : '/' + href);
+        }
+      } else {
+        // zh-CN
+        if (href === '/en/') {
+          newHref = '/';
+        } else if (href.startsWith('/en/')) {
+          // 章节页去掉前缀
+          newHref = href.replace(/^\/en/, '');
+          // 文章：/..../slug.en/ -> /..../slug/
+          if (articleEn.test(href)) {
+            newHref = newHref.replace(/\.en\/$/, '/');
+          }
+        } else if (articleEn.test(href)) {
+          // 直接把 .en/ 去掉
+          newHref = href.replace(/\.en\/$/, '/');
+        }
+      }
+
+      if (newHref !== href) {
+        a.setAttribute('href', newHref);
+      }
+    });
+  } catch (e) {
+    console.warn('ensureLinksLanguage error:', e);
+  }
+}
+
+// 页面加载完成后执行
+document.addEventListener('DOMContentLoaded', function() {
+  detectCurrentLanguage();
+  applyLanguagePreference();
+});
+
+// 监听浏览器历史导航（返回/前进按钮）：仅更新高亮和重写链接，不做跳转
+window.addEventListener('popstate', function() {
+  setTimeout(function() {
+    detectCurrentLanguage();
+    applyLanguagePreference();
+  }, 60);
+});
+
+// 如果是NexT主题的pjax，也需要在页面切换后执行：仅更新高亮和重写链接
+if (typeof NexT !== 'undefined') {
+  document.addEventListener('page:loaded', function() {
+    detectCurrentLanguage();
+    applyLanguagePreference();
+  });
+}
+</script>
+</body>
+</html>

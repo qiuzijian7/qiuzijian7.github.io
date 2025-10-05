@@ -197,7 +197,7 @@
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="bugmaker"
-      src="/images/person.png">
+      src="/images/person.webp">
   <p class="site-author-name" itemprop="name">bugmaker</p>
   <div class="site-description" itemprop="description">  一个专注于技术分享和个人成长的博客，涵盖UE、游戏设计、AI等内容<br>A blog focused on tech sharing and personal growth, covering UE, game design, AI, and more.</div>
 </div>
@@ -205,18 +205,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">3</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -253,10 +253,10 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://qiuzijian7.github.io/2025/09/21/test-comments/">
+    <link itemprop="mainEntityOfPage" href="https://qiuzijian7.github.io/2025/10/05/greeks-options/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/person.png">
+      <meta itemprop="image" content="/images/person.webp">
       <meta itemprop="name" content="bugmaker">
     </span>
 
@@ -271,7 +271,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/09/21/test-comments/" class="post-title-link" itemprop="url">测试评论功能</a>
+          <a href="/2025/10/05/greeks-options/" class="post-title-link" itemprop="url">期权希腊字母（Greeks）详解与使用案例</a>
         </h2>
 
         <div class="post-meta-container">
@@ -283,7 +283,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2025-09-21 14:00:00 / 修改时间：16:09:38" itemprop="dateCreated datePublished" datetime="2025-09-21T14:00:00+08:00">2025-09-21</time>
+      <time title="创建时间：2025-10-05 09:00:00 / 修改时间：10:20:38" itemprop="dateCreated datePublished" datetime="2025-10-05T09:00:00+08:00">2025-10-05</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -291,7 +291,11 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%B5%8B%E8%AF%95/" itemprop="url" rel="index"><span itemprop="name">测试</span></a>
+          <a href="/categories/%E6%8A%95%E8%B5%84/" itemprop="url" rel="index"><span itemprop="name">投资</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%8A%95%E8%B5%84/%E8%A1%8D%E7%94%9F%E5%93%81/" itemprop="url" rel="index"><span itemprop="name">衍生品</span></a>
         </span>
     </span>
 
@@ -305,11 +309,201 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>这是一篇用来测试评论功能的文章。</p>
-<h2 id="评论测试"><a href="#评论测试" class="headerlink" title="评论测试"></a>评论测试</h2><p>如果你能在文章底部看到评论框，说明评论功能配置成功了！</p>
+          <h1 id="期权中的字母（Greeks）详解与使用案例"><a href="#期权中的字母（Greeks）详解与使用案例" class="headerlink" title="期权中的字母（Greeks）详解与使用案例"></a>期权中的字母（Greeks）详解与使用案例</h1><p>本文以希腊字母（Greeks）为主线，说明含义、直觉理解与常见用法，并给出简洁案例。假设：标的为股票或指数，波动率为年化，时间为年单位；买入期权为多头，卖出期权为空头。</p>
+<h2 id="一、核心-Greeks"><a href="#一、核心-Greeks" class="headerlink" title="一、核心 Greeks"></a>一、核心 Greeks</h2><h3 id="Delta（Δ）"><a href="#Delta（Δ）" class="headerlink" title="Delta（Δ）"></a>Delta（Δ）</h3><ul>
+<li>含义：期权价格对标的价格的敏感度。标的涨 1 元，期权价约变动 Δ 元。</li>
+<li>直觉：看涨 Δ ∈ [0,1]；看跌 Δ ∈ [-1,0]。ATM ≈ ±0.5；深度实值接近 ±1；深度虚值接近 0。<ul>
+<li>0.25-0.35：赔率和胜率平衡</li>
+<li>0.5：胜率高，成本也高</li>
+</ul>
+</li>
+<li>用法：<ul>
+<li>仓位对冲：总 Delta ≈ 期权 Δ × 张数 × 合约乘数（例如 100）。若想 Delta 中性，用标的对冲。</li>
+<li>方向替代：用期权实现等效股票暴露（例如目标 300 股暴露→买入总 Δ ≈ 300）。</li>
+</ul>
+</li>
+<li>案例：标的 100→101；某看涨 Δ&#x3D;0.4；持 5 张（×100股）盈亏≈0.4×5×100&#x3D;200 元（忽略其他影响）。</li>
+</ul>
+<h3 id="Gamma（Γ）"><a href="#Gamma（Γ）" class="headerlink" title="Gamma（Γ）"></a>Gamma（Γ）</h3><ul>
+<li>含义：Delta 对标的价格的敏感度。标的再变 1 元，Delta 变化 Γ。</li>
+<li>直觉：ATM Gamma 最大；到期越近 Gamma 越尖锐。长 Gamma（买期权）“顺势”，短 Gamma（卖期权）“逆势”。</li>
+<li>用法：<ul>
+<li>Gamma scalping：买近月 ATM（多 Gamma），用标的动态对冲，靠波动赚取现金流以抵消 Theta。</li>
+<li>风险警戒：卖出近月期权在大波动时需频繁对冲，亏损可能放大。</li>
+</ul>
+</li>
+<li>案例：近月 ATM 看涨 Γ&#x3D;0.05；标的 100→102，Delta 约由 0.5→0.6（增量≈2×0.05）。</li>
+</ul>
+<h3 id="Theta（Θ）"><a href="#Theta（Θ）" class="headerlink" title="Theta（Θ）"></a>Theta（Θ）</h3><ul>
+<li>含义：时间价值衰减速度。对买方通常为负，每过一天价格损耗 Θ。</li>
+<li>直觉：到期越近、越接近 ATM，Theta 越高（买方“流血”快）；卖方受益于时间流逝。</li>
+<li>用法：<ul>
+<li>收时间：卖价差或铁秃鹰（受限风险），收取 Theta。</li>
+<li>抵消时间：通过 Gamma scalping 或事件驱动的波动兑现。</li>
+</ul>
+</li>
+<li>案例：ATM 看涨 Θ&#x3D;-0.02&#x2F;天；持 10 张（×100股）日损≈0.02×10×100&#x3D;20 元；若当日对冲赚 30 元，净 +10 元。</li>
+</ul>
+<h3 id="Vega（ν）"><a href="#Vega（ν）" class="headerlink" title="Vega（ν）"></a>Vega（ν）</h3><ul>
+<li>含义：期权价格对隐含波动率（IV）的敏感度。IV 上升 1 个百分点，价格变动约 Vega×0.01。</li>
+<li>直觉：到期更远与 ATM 的 Vega 更大。买方受益于 IV 上升（多 Vega），卖方受益于 IV 下降（空 Vega）。</li>
+<li>用法：<ul>
+<li>事件前后：财报前多 Vega（买跨式&#x2F;勒式），财报后 IV 通常塌陷可反向布局空 Vega。</li>
+<li>纯波动交易：判断未来 IV 上升→做多 Vega；反之做空 Vega（如日历价差）。</li>
+</ul>
+</li>
+<li>案例：Vega&#x3D;0.12；IV 20%→25%，单单位变动≈0.12×0.05&#x3D;0.006；10 张（×100股）≈6 元增益（仅 Vega）。</li>
+</ul>
+<h3 id="Rho（ρ）"><a href="#Rho（ρ）" class="headerlink" title="Rho（ρ）"></a>Rho（ρ）</h3><ul>
+<li>含义：期权价格对利率的敏感度。利率升 1%，看涨价升、看跌价降（股票期权）。</li>
+<li>直觉：到期越远 Rho 越显著；整体影响常小，但在加息&#x2F;降息周期与长到期需关注。</li>
+<li>用法：<ul>
+<li>长期配置：LEAPS 看涨更受益于加息。</li>
+<li>跨资产：在外汇&#x2F;商品中与持有成本共同影响定价。</li>
+</ul>
+</li>
+<li>案例：LEAPS 看涨 ρ&#x3D;0.4；利率 2%→3%，变动≈0.4×0.01&#x3D;0.004&#x2F;单位。</li>
+</ul>
+<h2 id="二、扩展或二阶-Greeks"><a href="#二、扩展或二阶-Greeks" class="headerlink" title="二、扩展或二阶 Greeks"></a>二、扩展或二阶 Greeks</h2><ul>
+<li>Vomma（Volga）：Vega 对 IV 的敏感度。IV 快速拉升时，多 Vega 组合收益加速。</li>
+<li>Vanna：Delta 对 IV（或 Vega 对标的价格）的敏感度。用于外汇&#x2F;商品的波动率微笑对冲。</li>
+<li>Charm（Delta Decay）：Delta 随时间的变化率。近月卖方在临近到期时需更勤对冲。</li>
+</ul>
+<h2 id="三、常见组合与场景"><a href="#三、常见组合与场景" class="headerlink" title="三、常见组合与场景"></a>三、常见组合与场景</h2><h3 id="场景-1：Delta-中性押波动（长-Gamma-长-Vega）"><a href="#场景-1：Delta-中性押波动（长-Gamma-长-Vega）" class="headerlink" title="场景 1：Delta 中性押波动（长 Gamma&#x2F;长 Vega）"></a>场景 1：Delta 中性押波动（长 Gamma&#x2F;长 Vega）</h3><ul>
+<li>动作：买近月 ATM 跨式（看涨+看跌），初始 Δ≈0，Γ&gt;0，ν&gt;0，Θ&lt;0。</li>
+<li>目标：标的大幅波动或 IV 上升；通过动态对冲“低吸高抛”赚现金流抵消 Theta。</li>
+<li>风险：标的不动且 IV 不升→Theta 亏损。</li>
+</ul>
+<h3 id="场景-2：收时间价值（短-Theta-短-Vega，受限风险）"><a href="#场景-2：收时间价值（短-Theta-短-Vega，受限风险）" class="headerlink" title="场景 2：收时间价值（短 Theta&#x2F;短 Vega，受限风险）"></a>场景 2：收时间价值（短 Theta&#x2F;短 Vega，受限风险）</h3><ul>
+<li>动作：卖出价差或铁秃鹰，结构限制最大亏损。</li>
+<li>目标：标的维持区间、IV 回落、时间流逝带来收益。</li>
+<li>风险：方向突破或 IV 飙升导致亏损；需设止损与防护腿。</li>
+</ul>
+<h3 id="场景-3：方向表达与杠杆控制（用-Delta-与-Gamma）"><a href="#场景-3：方向表达与杠杆控制（用-Delta-与-Gamma）" class="headerlink" title="场景 3：方向表达与杠杆控制（用 Delta 与 Gamma）"></a>场景 3：方向表达与杠杆控制（用 Delta 与 Gamma）</h3><ul>
+<li>动作：看涨时买略虚值看涨（初始 Δ≈0.3~0.4），若快速上行，Γ推动 Δ 贴近 1，实现加速收益。</li>
+<li>风险：走势不如预期时，Θ 损耗与 IV 回落（负 ν）双重打击。</li>
+</ul>
+<h3 id="场景-4：事件前后波动率交易（用-Vega）"><a href="#场景-4：事件前后波动率交易（用-Vega）" class="headerlink" title="场景 4：事件前后波动率交易（用 Vega）"></a>场景 4：事件前后波动率交易（用 Vega）</h3><ul>
+<li>动作：财报前多 Vega（跨式&#x2F;勒式），财报后 IV 通常塌陷，及时平仓或反向做空 Vega。</li>
+<li>案例：IV 30%→45%（前拉升）盈利；事件落地后回到 25%，未平仓易回吐。</li>
+</ul>
+<h3 id="场景-5：长到期与利率（用-Rho）"><a href="#场景-5：长到期与利率（用-Rho）" class="headerlink" title="场景 5：长到期与利率（用 Rho）"></a>场景 5：长到期与利率（用 Rho）</h3><ul>
+<li>动作：加息预期下偏好 LEAPS 看涨或减少看跌敞口。</li>
+<li>风险：利率路径与市场预期偏差可能与价格波动互相抵消。</li>
+</ul>
+<h2 id="四、综合数值示例（简化）"><a href="#四、综合数值示例（简化）" class="headerlink" title="四、综合数值示例（简化）"></a>四、综合数值示例（简化）</h2><ul>
+<li>设标的 S&#x3D;100；近月 ATM 跨式（同到期的看涨+看跌），单腿近似：<ul>
+<li>看涨 Δ≈+0.5、看跌 Δ≈-0.5 → 组合 Δ≈0</li>
+<li>Γ≈0.08&#x2F;腿 → 组合 Γ≈0.16</li>
+<li>Θ≈-0.03&#x2F;天&#x2F;腿 → 组合 Θ≈-0.06&#x2F;天</li>
+<li>ν≈0.10&#x2F;腿 → 组合 ν≈0.20</li>
+</ul>
+</li>
+<li>若当日标的振幅 ±3 元，动态对冲可实现累计现金流约 0.6~1.2 元&#x2F;单位（取决于执行与路径），可覆盖全部或部分日 Θ；若 IV 同时上升 5 个百分点，Vega 贡献≈0.20×0.05&#x3D;0.01&#x2F;单位，提升当日净收益。</li>
+</ul>
+<h2 id="五、实务要点与风险控制"><a href="#五、实务要点与风险控制" class="headerlink" title="五、实务要点与风险控制"></a>五、实务要点与风险控制</h2><ul>
+<li>Greeks 是动态的：到期、价内&#x2F;价外、IV 与标的价格都会改变它们。</li>
+<li>卖方优先受限结构：价差、铁秃鹰，尽量避免裸卖以控制尾部风险。</li>
+<li>买方注意时间与 IV：方向不动或 IV 下行，Θ 与负 ν 会侵蚀盈亏。</li>
+<li>动态对冲需纪律：设置调仓阈值（如 Δ 变化达 0.1 或价格变动达 x%），避免过度交易。</li>
+</ul>
+<p>如需我基于你的标的、到期与 IV 水平，给出可直接下单的结构与 Greeks 估算，请提供标的代码、到期日、执行价区间以及你的观点（看涨&#x2F;看跌&#x2F;看波动）。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://qiuzijian7.github.io/2025/09/30/compile-linux-on-windows/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/person.webp">
+      <meta itemprop="name" content="bugmaker">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Bugmaker's Blog">
+      <meta itemprop="description" content="  一个专注于技术分享和个人成长的博客，涵盖UE、游戏设计、AI等内容<br>A blog focused on tech sharing and personal growth, covering UE, game design, AI, and more.">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Bugmaker's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2025/09/30/compile-linux-on-windows/" class="post-title-link" itemprop="url">在Windows上编译UE5 Linux项目的完整指南</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-09-30 10:00:00" itemprop="dateCreated datePublished" datetime="2025-09-30T10:00:00+08:00">2025-09-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-10-05 09:22:48" itemprop="dateModified" datetime="2025-10-05T09:22:48+08:00">2025-10-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/UE5/" itemprop="url" rel="index"><span itemprop="name">UE5</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/UE5/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/UE5/Linux/%E7%BC%96%E8%AF%91/" itemprop="url" rel="index"><span itemprop="name">编译</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="在Windows上编译UE5-Linux项目的完整指南"><a href="#在Windows上编译UE5-Linux项目的完整指南" class="headerlink" title="在Windows上编译UE5 Linux项目的完整指南"></a>在Windows上编译UE5 Linux项目的完整指南</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在UE5开发过程中，经常会遇到Linux平台编译报错的问题。本文提供了一套完整的本地编译方案，帮助开发者在Windows环境下成功编译Linux版本的UE5项目。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2025/09/21/test-comments/#more" rel="contents">
+              <a class="btn" href="/2025/09/30/compile-linux-on-windows/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -340,10 +534,10 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://qiuzijian7.github.io/2025/09/20/hello-world/">
+    <link itemprop="mainEntityOfPage" href="https://qiuzijian7.github.io/2025/09/29/ue5coro_analysis/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/person.png">
+      <meta itemprop="image" content="/images/person.webp">
       <meta itemprop="name" content="bugmaker">
     </span>
 
@@ -358,7 +552,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/09/20/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
+          <a href="/2025/09/29/ue5coro_analysis/" class="post-title-link" itemprop="url">UE5Coro协程插件深度技术解析</a>
         </h2>
 
         <div class="post-meta-container">
@@ -369,14 +563,27 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2025-09-20 17:59:22" itemprop="dateCreated datePublished" datetime="2025-09-20T17:59:22+08:00">2025-09-20</time>
+      <time title="创建时间：2025-09-29 17:00:00" itemprop="dateCreated datePublished" datetime="2025-09-29T17:00:00+08:00">2025-09-29</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2025-09-21 16:09:54" itemprop="dateModified" datetime="2025-09-21T16:09:54+08:00">2025-09-21</time>
+      <time title="修改时间：2025-10-05 09:22:48" itemprop="dateModified" datetime="2025-10-05T09:22:48+08:00">2025-10-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">游戏开发</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E/" itemprop="url" rel="index"><span itemprop="name">虚幻引擎</span></a>
+        </span>
     </span>
 
   
@@ -389,20 +596,15 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
+          <h1 id="UE5Coro协程插件深度技术解析"><a href="#UE5Coro协程插件深度技术解析" class="headerlink" title="UE5Coro协程插件深度技术解析"></a>UE5Coro协程插件深度技术解析</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>UE5Coro是一个为虚幻引擎5设计的现代C++20协程插件，它将标准库的协程功能无缝集成到UE5的游戏循环和蓝图系统中。本文将深入分析其核心实现机制、Promise系统设计以及与虚幻引擎的深度集成方式。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/09/29/ue5coro_analysis/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 

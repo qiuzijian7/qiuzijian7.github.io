@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"qiuzijian7.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":false,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="In-Depth Technical Analysis of UE5Coro Coroutine PluginOverviewUE5Coro is a modern C++20 coroutine plugin designed for Unreal Engine 5, seamlessly integrating standard library coroutine functionality">
+<meta property="og:type" content="article">
+<meta property="og:title" content="In-Depth Technical Analysis of UE5Coro Coroutine Plugin">
+<meta property="og:url" content="https://qiuzijian7.github.io/2025/09/29/ue5coro_analysis.en/index.html">
+<meta property="og:site_name" content="Bugmaker&#39;s Blog">
+<meta property="og:description" content="In-Depth Technical Analysis of UE5Coro Coroutine PluginOverviewUE5Coro is a modern C++20 coroutine plugin designed for Unreal Engine 5, seamlessly integrating standard library coroutine functionality">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-09-29T09:00:00.000Z">
+<meta property="article:modified_time" content="2025-10-05T01:22:48.000Z">
+<meta property="article:author" content="bugmaker">
+<meta property="article:tag" content="UE5">
+<meta property="article:tag" content="C++">
+<meta property="article:tag" content="Coroutines">
+<meta property="article:tag" content="Async Programming">
+<meta property="article:tag" content="Source Code Analysis">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://qiuzijian7.github.io/2025/09/29/ue5coro_analysis.en/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://qiuzijian7.github.io/2025/09/29/ue5coro_analysis.en/","path":"2025/09/29/ue5coro_analysis.en/","title":"In-Depth Technical Analysis of UE5Coro Coroutine Plugin"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>In-Depth Technical Analysis of UE5Coro Coroutine Plugin | Bugmaker's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<!-- 自定义语言切换器样式 -->
+<style>
+.language-switcher {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 5px 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  backdrop-filter: blur(10px);
+}
+
+.language-switcher a {
+  color: #333;
+  text-decoration: none;
+  padding: 5px 8px;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.language-switcher a:hover {
+  background: #007acc;
+  color: white;
+}
+
+.language-switcher a.active {
+  background: #007acc;
+  color: white;
+}
+
+.language-switcher .separator {
+  color: #ccc;
+  margin: 0 3px;
+}
+
+/* 暗色模式适配 */
+.dark-mode .language-switcher {
+  background: rgba(0, 0, 0, 0.8);
+  border-color: #444;
+}
+
+.dark-mode .language-switcher a {
+  color: #fff;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .language-switcher {
+    top: 10px;
+    right: 10px;
+    padding: 3px 8px;
+  }
+  
+  .language-switcher a {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+}
+</style>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Bugmaker's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">分享技术，记录成长<br>Sharing Technology, Recording Growth</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#In-Depth-Technical-Analysis-of-UE5Coro-Coroutine-Plugin"><span class="nav-number">1.</span> <span class="nav-text">In-Depth Technical Analysis of UE5Coro Coroutine Plugin</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Overview"><span class="nav-number">1.1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Core-Implementation-Mechanisms"><span class="nav-number">1.2.</span> <span class="nav-text">1. Core Implementation Mechanisms</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-TCoroutine-Type-System"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.1 TCoroutine Type System</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-Promise-System-Architecture"><span class="nav-number">1.2.2.</span> <span class="nav-text">1.2 Promise System Architecture</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Subsystem-Integration-Mechanism"><span class="nav-number">1.3.</span> <span class="nav-text">2. Subsystem Integration Mechanism</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-UUE5CoroSubsystem-Core-Functionality"><span class="nav-number">1.3.1.</span> <span class="nav-text">2.1 UUE5CoroSubsystem Core Functionality</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Lifecycle-Management"><span class="nav-number">1.3.2.</span> <span class="nav-text">2.2 Lifecycle Management</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Coroutine-Type-System"><span class="nav-number">1.4.</span> <span class="nav-text">3. Coroutine Type System</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Coroutine-Trait-Detection"><span class="nav-number">1.4.1.</span> <span class="nav-text">3.1 Coroutine Trait Detection</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Coroutine-Creation-and-Management"><span class="nav-number">1.4.2.</span> <span class="nav-text">3.2 Coroutine Creation and Management</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Awaiter-System-Details"><span class="nav-number">1.5.</span> <span class="nav-text">4. Awaiter System Details</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Latent-Awaiters"><span class="nav-number">1.5.1.</span> <span class="nav-text">4.1 Latent Awaiters</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Async-Awaiters"><span class="nav-number">1.5.2.</span> <span class="nav-text">4.2 Async Awaiters</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Cancellation-Mechanism"><span class="nav-number">1.6.</span> <span class="nav-text">5. Cancellation Mechanism</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-Cancellation-Tracker"><span class="nav-number">1.6.1.</span> <span class="nav-text">5.1 Cancellation Tracker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-Cancelable-Awaiter"><span class="nav-number">1.6.2.</span> <span class="nav-text">5.2 Cancelable Awaiter</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Typical-Usage-Scenarios"><span class="nav-number">1.7.</span> <span class="nav-text">6. Typical Usage Scenarios</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-Latent-UFUNCTION-Coroutines"><span class="nav-number">1.7.1.</span> <span class="nav-text">6.1 Latent UFUNCTION Coroutines</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-Async-Asset-Loading"><span class="nav-number">1.7.2.</span> <span class="nav-text">6.2 Async Asset Loading</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-Condition-Waiting-and-Polling"><span class="nav-number">1.7.3.</span> <span class="nav-text">6.3 Condition Waiting and Polling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-Multi-threaded-Coroutines"><span class="nav-number">1.7.4.</span> <span class="nav-text">6.4 Multi-threaded Coroutines</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-Performance-Optimization-Recommendations"><span class="nav-number">1.8.</span> <span class="nav-text">7. Performance Optimization Recommendations</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-Choose-Appropriate-Coroutine-Types"><span class="nav-number">1.8.1.</span> <span class="nav-text">7.1 Choose Appropriate Coroutine Types</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-Avoid-Frequent-Thread-Switching"><span class="nav-number">1.8.2.</span> <span class="nav-text">7.2 Avoid Frequent Thread Switching</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-Proper-Use-of-Cancellation-Mechanism"><span class="nav-number">1.8.3.</span> <span class="nav-text">7.3 Proper Use of Cancellation Mechanism</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-Engineering-Practice-Guide"><span class="nav-number">1.9.</span> <span class="nav-text">8. Engineering Practice Guide</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-1-Best-Practices"><span class="nav-number">1.9.1.</span> <span class="nav-text">8.1 Best Practices</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-Debugging-Techniques"><span class="nav-number">1.9.2.</span> <span class="nav-text">8.2 Debugging Techniques</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-Error-Handling"><span class="nav-number">1.9.3.</span> <span class="nav-text">8.3 Error Handling</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-Summary"><span class="nav-number">1.10.</span> <span class="nav-text">9. Summary</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Key-Advantages"><span class="nav-number">1.10.1.</span> <span class="nav-text">Key Advantages</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Important-Notice-UE5-5-Linux-Compilation-Issues"><span class="nav-number">1.11.</span> <span class="nav-text">Important Notice: UE5.5 Linux Compilation Issues</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Issue-Description"><span class="nav-number">1.11.1.</span> <span class="nav-text">Issue Description</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Root-Causes"><span class="nav-number">1.11.2.</span> <span class="nav-text">Root Causes</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="bugmaker"
+      src="/images/person.webp">
+  <p class="site-author-name" itemprop="name">bugmaker</p>
+  <div class="site-description" itemprop="description">  一个专注于技术分享和个人成长的博客，涵盖UE、游戏设计、AI等内容<br>A blog focused on tech sharing and personal growth, covering UE, game design, AI, and more.</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/qiuzijian7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;qiuzijian7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:919868412@qq.com" title="E-Mail → mailto:919868412@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/bugmaker-24" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;bugmaker-24" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i>知乎</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://qiuzijian7.github.io/2025/09/29/ue5coro_analysis.en/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/person.webp">
+      <meta itemprop="name" content="bugmaker">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Bugmaker's Blog">
+      <meta itemprop="description" content="  一个专注于技术分享和个人成长的博客，涵盖UE、游戏设计、AI等内容<br>A blog focused on tech sharing and personal growth, covering UE, game design, AI, and more.">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="In-Depth Technical Analysis of UE5Coro Coroutine Plugin | Bugmaker's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          In-Depth Technical Analysis of UE5Coro Coroutine Plugin
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2025-09-29 17:00:00" itemprop="dateCreated datePublished" datetime="2025-09-29T17:00:00+08:00">2025-09-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2025-10-05 09:22:48" itemprop="dateModified" datetime="2025-10-05T09:22:48+08:00">2025-10-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Game-Development/" itemprop="url" rel="index"><span itemprop="name">Game Development</span></a>
+        </span>
+          , 
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Game-Development/Unreal-Engine/" itemprop="url" rel="index"><span itemprop="name">Unreal Engine</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="In-Depth-Technical-Analysis-of-UE5Coro-Coroutine-Plugin"><a href="#In-Depth-Technical-Analysis-of-UE5Coro-Coroutine-Plugin" class="headerlink" title="In-Depth Technical Analysis of UE5Coro Coroutine Plugin"></a>In-Depth Technical Analysis of UE5Coro Coroutine Plugin</h1><h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>UE5Coro is a modern C++20 coroutine plugin designed for Unreal Engine 5, seamlessly integrating standard library coroutine functionality into UE5’s game loop and Blueprint system. This article provides an in-depth analysis of its core implementation mechanisms, Promise system design, and deep integration with Unreal Engine.</p>
+<span id="more"></span>
+
+<h2 id="1-Core-Implementation-Mechanisms"><a href="#1-Core-Implementation-Mechanisms" class="headerlink" title="1. Core Implementation Mechanisms"></a>1. Core Implementation Mechanisms</h2><h3 id="1-1-TCoroutine-Type-System"><a href="#1-1-TCoroutine-Type-System" class="headerlink" title="1.1 TCoroutine Type System"></a>1.1 TCoroutine Type System</h3><p>The core of UE5Coro is the <code>TCoroutine&lt;T&gt;</code> template class, providing type-safe coroutine handles:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Core coroutine type definition</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T = <span class="type">void</span>&gt;</span><br><span class="line"><span class="keyword">class</span> TCoroutine;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Base coroutine type (no return value)</span></span><br><span class="line"><span class="keyword">template</span>&lt;&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UE5CORO_API</span> TCoroutine&lt;&gt;</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    std::shared_ptr&lt;Private::FPromiseExtras&gt; Extras;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">/** Request the coroutine to stop executing at the next opportunity */</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Cancel</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** Block and wait for coroutine completion */</span></span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">Wait</span><span class="params">(uint32 WaitTimeMilliseconds = std::numeric_limits&lt;uint32&gt;::max(),</span></span></span><br><span class="line"><span class="params"><span class="function">              <span class="type">bool</span> bIgnoreThreadIdleStats = <span class="literal">false</span>)</span> <span class="type">const</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** Returns whether the coroutine has completed */</span></span><br><span class="line">    [[nodiscard]] <span class="function"><span class="type">bool</span> <span class="title">IsDone</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** Returns whether the coroutine completed successfully */</span></span><br><span class="line">    [[nodiscard]] <span class="function"><span class="type">bool</span> <span class="title">WasSuccessful</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** Call the provided function when coroutine completes */</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">ContinueWith</span><span class="params">(std::invocable <span class="keyword">auto</span> Fn)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Coroutine type with return value</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TCoroutine</span> : <span class="keyword">public</span> TCoroutine&lt;&gt;</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">using</span> FResultType = T;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** Wait for coroutine completion and get result */</span></span><br><span class="line">    [[nodiscard]] <span class="function"><span class="type">const</span> T&amp; <span class="title">GetResult</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** Wait for coroutine completion and move result */</span></span><br><span class="line">    [[nodiscard]] <span class="function">T&amp;&amp; <span class="title">MoveResult</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-Promise-System-Architecture"><a href="#1-2-Promise-System-Architecture" class="headerlink" title="1.2 Promise System Architecture"></a>1.2 Promise System Architecture</h3><p>UE5Coro uses a dual-layer Promise system to handle different execution modes:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Promise base class</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UE5CORO_API</span> FPromise</span><br><span class="line">&#123;</span><br><span class="line">    FCancellationTracker CancellationTracker;</span><br><span class="line">    std::shared_ptr&lt;FPromiseExtras&gt; Extras;</span><br><span class="line">    TArray&lt;std::function&lt;<span class="type">void</span>(<span class="type">void</span>*)&gt;&gt; OnCompleted;</span><br><span class="line">    </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Cancel</span><span class="params">(<span class="type">bool</span> bBypassCancellationHolds)</span></span>;</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">ShouldCancel</span><span class="params">(<span class="type">bool</span> bBypassCancellationHolds)</span> <span class="type">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Resume</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">AddContinuation</span><span class="params">(std::function&lt;<span class="type">void</span>(<span class="type">void</span>*)&gt;)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Async Promise (for background threads)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UE5CORO_API</span> FAsyncPromise : <span class="keyword">public</span> FPromise</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">FInitialSuspend <span class="title">initial_suspend</span><span class="params">()</span> <span class="keyword">noexcept</span> </span>&#123; <span class="keyword">return</span> &#123;FInitialSuspend::Resume&#125;; &#125;</span><br><span class="line">    <span class="function">std::suspend_never <span class="title">final_suspend</span><span class="params">()</span> <span class="keyword">noexcept</span> </span>&#123; <span class="keyword">return</span> &#123;&#125;; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Latent Promise (for game thread integration)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UE5CORO_API</span> FLatentPromise : <span class="keyword">public</span> FPromise</span><br><span class="line">&#123;</span><br><span class="line">    TWeakObjectPtr&lt;UWorld&gt; World;</span><br><span class="line">    <span class="type">void</span>* LatentAction = <span class="literal">nullptr</span>;</span><br><span class="line">    std::atomic&lt;<span class="type">int</span>&gt; LatentFlags = <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">AttachToGameThread</span><span class="params">(<span class="type">bool</span> bFromAnyThread = <span class="literal">false</span>)</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">DetachFromGameThread</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">IsOnGameThread</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-Subsystem-Integration-Mechanism"><a href="#2-Subsystem-Integration-Mechanism" class="headerlink" title="2. Subsystem Integration Mechanism"></a>2. Subsystem Integration Mechanism</h2><h3 id="2-1-UUE5CoroSubsystem-Core-Functionality"><a href="#2-1-UUE5CoroSubsystem-Core-Functionality" class="headerlink" title="2.1 UUE5CoroSubsystem Core Functionality"></a>2.1 UUE5CoroSubsystem Core Functionality</h3><p>UE5Coro deeply integrates with the engine lifecycle through <code>UUE5CoroSubsystem</code>:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UCLASS</span>(Hidden, MinimalAPI)</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UUE5CoroSubsystem</span> <span class="keyword">final</span> : <span class="keyword">public</span> UTickableWorldSubsystem</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">UPROPERTY</span>()</span><br><span class="line">    TMap&lt;int32, TObjectPtr&lt;<span class="keyword">class</span> <span class="title class_">UUE5CoroChainCallbackTarget</span>&gt;&gt; ChainCallbackTargets;</span><br><span class="line">    int32 NextLinkage = <span class="number">0</span>;</span><br><span class="line">    FDelegateHandle LatentActionsChangedHandle;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">/** Create a uniquely valid LatentInfo */</span></span><br><span class="line">    [[nodiscard]] <span class="function">UE5CORO_API FLatentActionInfo <span class="title">MakeLatentInfo</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** Create valid LatentInfo for Latent::Chain functions */</span></span><br><span class="line">    [[nodiscard]] <span class="function">FLatentActionInfo <span class="title">MakeLatentInfo</span><span class="params">(UE5Coro::Private::FTwoLives*)</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Tick</span><span class="params">(<span class="type">float</span> DeltaTime)</span> <span class="keyword">override</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-Lifecycle-Management"><a href="#2-2-Lifecycle-Management" class="headerlink" title="2.2 Lifecycle Management"></a>2.2 Lifecycle Management</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">UUE5CoroSubsystem::Tick</span><span class="params">(<span class="type">float</span> DeltaTime)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Super::<span class="built_in">Tick</span>(DeltaTime);</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> UE_VERSION_OLDER_THAN(5, 5, 0)</span></span><br><span class="line">    <span class="comment">// ProcessLatentActions refuses to work on non-BP classes before UE5.5</span></span><br><span class="line">    <span class="built_in">GetClass</span>()-&gt;ClassFlags |= CLASS_CompiledFromBlueprint;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">    <span class="built_in">GetWorld</span>()-&gt;<span class="built_in">GetLatentActionManager</span>().<span class="built_in">ProcessLatentActions</span>(<span class="keyword">this</span>, DeltaTime);</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> UE_VERSION_OLDER_THAN(5, 5, 0)</span></span><br><span class="line">    <span class="built_in">GetClass</span>()-&gt;ClassFlags &amp;= ~CLASS_CompiledFromBlueprint;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-Coroutine-Type-System"><a href="#3-Coroutine-Type-System" class="headerlink" title="3. Coroutine Type System"></a>3. Coroutine Type System</h2><h3 id="3-1-Coroutine-Trait-Detection"><a href="#3-1-Coroutine-Trait-Detection" class="headerlink" title="3.1 Coroutine Trait Detection"></a>3.1 Coroutine Trait Detection</h3><p>UE5Coro uses C++20 concepts to define awaitable types:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> UE5Coro</span><br><span class="line">&#123;</span><br><span class="line"><span class="comment">/** Types that can be co_awaited in coroutines returning TCoroutine */</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">concept</span> TAwaitable = <span class="keyword">requires</span></span><br><span class="line">&#123;</span><br><span class="line">    Private::TAwaitTransform&lt;Private::FLatentPromise, std::<span class="type">remove_cvref_t</span>&lt;T&gt;&gt;()(std::<span class="built_in">declval</span>&lt;T&gt;())</span><br><span class="line">    .<span class="built_in">await_suspend</span>(std::declval&lt;std::coroutine_handle&lt;Private::FLatentPromise&gt;&gt;());</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** Types that get special treatment in latent coroutines (fast path) */</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">concept</span> TLatentAwaiter = std::derived_from&lt;T, Private::FLatentAwaiter&gt;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** Types that support fast cancellation */</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">concept</span> TCancelableAwaiter = std::derived_from&lt;T, Private::TCancelableAwaiter&lt;T&gt;&gt;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-Coroutine-Creation-and-Management"><a href="#3-2-Coroutine-Creation-and-Management" class="headerlink" title="3.2 Coroutine Creation and Management"></a>3.2 Coroutine Creation and Management</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Coroutine creation example</span></span><br><span class="line">TCoroutine&lt;&gt; <span class="built_in">ExampleCoroutine</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Coroutine started&quot;</span>));</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Wait for 1 second</span></span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Latent::<span class="built_in">Seconds</span>(<span class="number">1.0f</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Delay completed&quot;</span>));</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Wait for next tick</span></span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Latent::<span class="built_in">NextTick</span>();</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Coroutine completed&quot;</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Coroutine with return value</span></span><br><span class="line"><span class="function">TCoroutine&lt;FString&gt; <span class="title">ProcessDataCoroutine</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Latent::<span class="built_in">Seconds</span>(<span class="number">2.0f</span>);</span><br><span class="line">    <span class="function"><span class="keyword">co_return</span> <span class="title">TEXT</span><span class="params">(<span class="string">&quot;Processing completed&quot;</span>)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-Awaiter-System-Details"><a href="#4-Awaiter-System-Details" class="headerlink" title="4. Awaiter System Details"></a>4. Awaiter System Details</h2><h3 id="4-1-Latent-Awaiters"><a href="#4-1-Latent-Awaiters" class="headerlink" title="4.1 Latent Awaiters"></a>4.1 Latent Awaiters</h3><p>Latent Awaiters are tightly integrated with the game thread, providing game loop-related waiting functionality:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> UE5Coro::Latent</span><br><span class="line">&#123;</span><br><span class="line"><span class="comment">// Base latent awaiter class</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UE5CORO_API</span> FLatentAwaiter</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">void</span>* State;</span><br><span class="line">    <span class="built_in">bool</span> (*Resume)(<span class="type">void</span>* State, <span class="type">bool</span> bCleanup);</span><br><span class="line">    </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">FLatentAwaiter</span><span class="params">(<span class="type">void</span>* State, <span class="type">bool</span> (*Resume)(<span class="type">void</span>*, <span class="type">bool</span>), <span class="keyword">auto</span> WorldSensitive)</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">    </span><br><span class="line">    [[nodiscard]] <span class="function"><span class="type">bool</span> <span class="title">await_ready</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">ShouldResume</span>(); &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">template</span>&lt;std::derived_from&lt;FPromise&gt; P&gt;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">await_suspend</span><span class="params">(std::coroutine_handle&lt;P&gt; Handle)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="built_in">Suspend</span>(Handle.<span class="built_in">promise</span>());</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">await_resume</span><span class="params">()</span> <span class="keyword">noexcept</span> </span>&#123; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Time-related awaiters</span></span><br><span class="line"><span class="function">UE5CORO_API <span class="keyword">auto</span> <span class="title">NextTick</span><span class="params">()</span> -&gt; Private::FLatentAwaiter</span>;</span><br><span class="line"><span class="function">UE5CORO_API <span class="keyword">auto</span> <span class="title">Ticks</span><span class="params">(int64 Ticks)</span> -&gt; Private::FLatentAwaiter</span>;</span><br><span class="line"><span class="function">UE5CORO_API <span class="keyword">auto</span> <span class="title">Seconds</span><span class="params">(<span class="type">double</span> Seconds)</span> -&gt; Private::FLatentAwaiter</span>;</span><br><span class="line"><span class="function">UE5CORO_API <span class="keyword">auto</span> <span class="title">RealSeconds</span><span class="params">(<span class="type">double</span> Seconds)</span> -&gt; Private::FLatentAwaiter</span>;</span><br><span class="line"><span class="function">UE5CORO_API <span class="keyword">auto</span> <span class="title">Until</span><span class="params">(std::function&lt;<span class="type">bool</span>()&gt; Function)</span> -&gt; Private::FLatentAwaiter</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-Async-Awaiters"><a href="#4-2-Async-Awaiters" class="headerlink" title="4.2 Async Awaiters"></a>4.2 Async Awaiters</h3><p>Async Awaiters handle multi-threading operations and thread switching:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> UE5Coro::Async</span><br><span class="line">&#123;</span><br><span class="line"><span class="comment">// Thread switching awaiter</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UE5CORO_API</span> FAsyncAwaiter : <span class="keyword">public</span> TAwaiter&lt;FAsyncAwaiter&gt;</span><br><span class="line">&#123;</span><br><span class="line">    ENamedThreads::Type Thread;</span><br><span class="line">    </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">FAsyncAwaiter</span><span class="params">(ENamedThreads::Type Thread)</span> <span class="keyword">noexcept</span> : Thread(Thread) &#123;</span> &#125;</span><br><span class="line">    </span><br><span class="line">    [[nodiscard]] <span class="function"><span class="type">bool</span> <span class="title">await_ready</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Suspend</span><span class="params">(FPromise&amp;)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Thread switching functions</span></span><br><span class="line"><span class="function">UE5CORO_API <span class="keyword">auto</span> <span class="title">MoveToThread</span><span class="params">(ENamedThreads::Type)</span> <span class="keyword">noexcept</span> -&gt; Private::FAsyncAwaiter</span>;</span><br><span class="line"><span class="function">UE5CORO_API <span class="keyword">auto</span> <span class="title">MoveToGameThread</span><span class="params">()</span> <span class="keyword">noexcept</span> -&gt; Private::FAsyncAwaiter</span>;</span><br><span class="line"><span class="function">UE5CORO_API <span class="keyword">auto</span> <span class="title">MoveToTask</span><span class="params">(<span class="type">const</span> TCHAR* DebugName = <span class="literal">nullptr</span>)</span> -&gt; Private::FTaskAwaiter</span>;</span><br><span class="line"><span class="function">UE5CORO_API <span class="keyword">auto</span> <span class="title">Yield</span><span class="params">()</span> <span class="keyword">noexcept</span> -&gt; Private::FAsyncYieldAwaiter</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-Cancellation-Mechanism"><a href="#5-Cancellation-Mechanism" class="headerlink" title="5. Cancellation Mechanism"></a>5. Cancellation Mechanism</h2><h3 id="5-1-Cancellation-Tracker"><a href="#5-1-Cancellation-Tracker" class="headerlink" title="5.1 Cancellation Tracker"></a>5.1 Cancellation Tracker</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">FCancellationTracker</span></span><br><span class="line">&#123;</span><br><span class="line">    std::atomic&lt;<span class="type">bool</span>&gt; bCanceled = <span class="literal">false</span>;</span><br><span class="line">    std::atomic&lt;<span class="type">int</span>&gt; CancellationHolds = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Cancel</span><span class="params">()</span> </span>&#123; bCanceled = <span class="literal">true</span>; &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Hold</span><span class="params">()</span> </span>&#123; <span class="built_in">verify</span>(++CancellationHolds &gt;= <span class="number">0</span>); &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Release</span><span class="params">()</span> </span>&#123; <span class="built_in">verify</span>(--CancellationHolds &gt;= <span class="number">0</span>); &#125;</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">ShouldCancel</span><span class="params">(<span class="type">bool</span> bBypassHolds)</span> <span class="type">const</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> bCanceled &amp;&amp; (bBypassHolds || CancellationHolds == <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-Cancelable-Awaiter"><a href="#5-2-Cancelable-Awaiter" class="headerlink" title="5.2 Cancelable Awaiter"></a>5.2 Cancelable Awaiter</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TCancelableAwaiter</span> : <span class="keyword">public</span> TAwaiter&lt;T&gt;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">void</span> (*fn_)(<span class="type">void</span>*, FPromise&amp;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">TCancelableAwaiter</span><span class="params">(<span class="type">void</span> (*Cancel)(<span class="type">void</span>*, FPromise&amp;))</span> : fn_(Cancel) &#123;</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span>&lt;std::derived_from&lt;FPromise&gt; P&gt;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">await_suspend</span><span class="params">(std::coroutine_handle&lt;P&gt; Handle)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        TAwaiter&lt;T&gt;::<span class="built_in">await_suspend</span>(Handle);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-Typical-Usage-Scenarios"><a href="#6-Typical-Usage-Scenarios" class="headerlink" title="6. Typical Usage Scenarios"></a>6. Typical Usage Scenarios</h2><h3 id="6-1-Latent-UFUNCTION-Coroutines"><a href="#6-1-Latent-UFUNCTION-Coroutines" class="headerlink" title="6.1 Latent UFUNCTION Coroutines"></a>6.1 Latent UFUNCTION Coroutines</h3><p>The core feature of UE5Coro is seamless integration with the Blueprint system:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UFUNCTION</span>(BlueprintCallable, meta = (Latent, LatentInfo = LatentInfo))</span><br><span class="line"><span class="function">FVoidCoroutine <span class="title">ExampleLatentFunction</span><span class="params">(FLatentActionInfo LatentInfo)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Latent function started&quot;</span>));</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Wait for 1 second (non-blocking to game thread)</span></span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Latent::<span class="built_in">Seconds</span>(<span class="number">1.0f</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Continue after 1 second&quot;</span>));</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Move to background thread</span></span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Async::<span class="built_in">MoveToTask</span>();</span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;On game thread: &#123;0&#125;&quot;</span>), <span class="built_in">IsInGameThread</span>());</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Perform time-consuming calculation</span></span><br><span class="line">    FString Value = <span class="built_in">TEXT</span>(<span class="string">&quot;Simulated computation result&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Return to game thread</span></span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Async::<span class="built_in">MoveToGameThread</span>();</span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;On game thread: &#123;0&#125;&quot;</span>), <span class="built_in">IsInGameThread</span>());</span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Computation result: &#123;0&#125;&quot;</span>), Value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-2-Async-Asset-Loading"><a href="#6-2-Async-Asset-Loading" class="headerlink" title="6.2 Async Asset Loading"></a>6.2 Async Asset Loading</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Async load single object</span></span><br><span class="line"><span class="function">TCoroutine&lt;UTexture2D*&gt; <span class="title">LoadTextureAsync</span><span class="params">(TSoftObjectPtr&lt;UTexture2D&gt; SoftTexture)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    UTexture2D* LoadedTexture = <span class="keyword">co_await</span> UE5Coro::Latent::<span class="built_in">AsyncLoadObject</span>(SoftTexture);</span><br><span class="line">    <span class="keyword">if</span> (LoadedTexture)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Texture loaded successfully: %s&quot;</span>), *LoadedTexture-&gt;<span class="built_in">GetName</span>());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">co_return</span> LoadedTexture;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Async load multiple objects</span></span><br><span class="line">TCoroutine&lt;TArray&lt;UStaticMesh*&gt;&gt; <span class="built_in">LoadMeshesAsync</span>(<span class="type">const</span> TArray&lt;TSoftObjectPtr&lt;UStaticMesh&gt;&gt;&amp; SoftMeshes)</span><br><span class="line">&#123;</span><br><span class="line">    TArray&lt;UStaticMesh*&gt; LoadedMeshes = <span class="keyword">co_await</span> UE5Coro::Latent::<span class="built_in">AsyncLoadObjects</span>(SoftMeshes);</span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Loaded &#123;0&#125; meshes&quot;</span>), LoadedMeshes.<span class="built_in">Num</span>());</span><br><span class="line">    <span class="keyword">co_return</span> LoadedMeshes;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-3-Condition-Waiting-and-Polling"><a href="#6-3-Condition-Waiting-and-Polling" class="headerlink" title="6.3 Condition Waiting and Polling"></a>6.3 Condition Waiting and Polling</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Wait for condition to be met</span></span><br><span class="line">TCoroutine&lt;&gt; <span class="built_in">WaitForPlayerInArea</span>(<span class="type">const</span> FVector&amp; Center, <span class="type">float</span> Radius)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Latent::<span class="built_in">Until</span>([Center, Radius]() -&gt; <span class="type">bool</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (APlayerController* PC = UGameplayStatics::<span class="built_in">GetPlayerController</span>(GWorld, <span class="number">0</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (APawn* Pawn = PC-&gt;<span class="built_in">GetPawn</span>())</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="type">float</span> Distance = FVector::<span class="built_in">Dist</span>(Pawn-&gt;<span class="built_in">GetActorLocation</span>(), Center);</span><br><span class="line">                <span class="keyword">return</span> Distance &lt;= Radius;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;);</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Player has entered the specified area&quot;</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Frame-distributed processing of large datasets</span></span><br><span class="line">TCoroutine&lt;&gt; <span class="built_in">ProcessLargeDataSet</span>(<span class="type">const</span> TArray&lt;FData&gt;&amp; DataSet)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">const</span> int32 BatchSize = <span class="number">100</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (int32 i = <span class="number">0</span>; i &lt; DataSet.<span class="built_in">Num</span>(); i += BatchSize)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Process a batch of data</span></span><br><span class="line">        int32 EndIndex = FMath::<span class="built_in">Min</span>(i + BatchSize, DataSet.<span class="built_in">Num</span>());</span><br><span class="line">        <span class="keyword">for</span> (int32 j = i; j &lt; EndIndex; ++j)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">ProcessSingleData</span>(DataSet[j]);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Yield control after processing each batch</span></span><br><span class="line">        <span class="keyword">co_await</span> UE5Coro::Latent::<span class="built_in">NextTick</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Large dataset processing completed&quot;</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-4-Multi-threaded-Coroutines"><a href="#6-4-Multi-threaded-Coroutines" class="headerlink" title="6.4 Multi-threaded Coroutines"></a>6.4 Multi-threaded Coroutines</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Thread switching example</span></span><br><span class="line"><span class="function">TCoroutine&lt;FString&gt; <span class="title">BackgroundProcessing</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Starting on game thread&quot;</span>));</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Switch to background thread</span></span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Async::<span class="built_in">MoveToTask</span>(<span class="built_in">TEXT</span>(<span class="string">&quot;BackgroundWork&quot;</span>));</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Perform CPU-intensive task</span></span><br><span class="line">    FString Result;</span><br><span class="line">    <span class="keyword">for</span> (int32 i = <span class="number">0</span>; i &lt; <span class="number">1000000</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        Result += FString::<span class="built_in">Printf</span>(<span class="built_in">TEXT</span>(<span class="string">&quot;%d&quot;</span>), i % <span class="number">10</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Return to game thread</span></span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Async::<span class="built_in">MoveToGameThread</span>();</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Returned to game thread, result length: %d&quot;</span>), Result.<span class="built_in">Len</span>());</span><br><span class="line">    <span class="keyword">co_return</span> Result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Using thread pool</span></span><br><span class="line">TCoroutine&lt;&gt; <span class="built_in">ThreadPoolExample</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Async::<span class="built_in">MoveToThreadPool</span>(*GThreadPool, EQueuedWorkPriority::High);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Execute work in thread pool</span></span><br><span class="line">    <span class="built_in">DoHeavyWork</span>();</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Async::<span class="built_in">MoveToGameThread</span>();</span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Thread pool work completed&quot;</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="7-Performance-Optimization-Recommendations"><a href="#7-Performance-Optimization-Recommendations" class="headerlink" title="7. Performance Optimization Recommendations"></a>7. Performance Optimization Recommendations</h2><h3 id="7-1-Choose-Appropriate-Coroutine-Types"><a href="#7-1-Choose-Appropriate-Coroutine-Types" class="headerlink" title="7.1 Choose Appropriate Coroutine Types"></a>7.1 Choose Appropriate Coroutine Types</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// For functions requiring Blueprint integration, use latent coroutines</span></span><br><span class="line"><span class="built_in">UFUNCTION</span>(BlueprintCallable, meta = (Latent, LatentInfo = LatentInfo))</span><br><span class="line"><span class="function">FVoidCoroutine <span class="title">BlueprintFunction</span><span class="params">(FLatentActionInfo LatentInfo)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// Automatically uses FLatentPromise, integrated with game thread</span></span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Latent::<span class="built_in">Seconds</span>(<span class="number">1.0f</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// For pure C++ background processing, use async coroutines</span></span><br><span class="line">TCoroutine&lt;&gt; <span class="built_in">BackgroundTask</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Automatically uses FAsyncPromise, more lightweight</span></span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Async::<span class="built_in">MoveToTask</span>();</span><br><span class="line">    <span class="built_in">DoBackgroundWork</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-2-Avoid-Frequent-Thread-Switching"><a href="#7-2-Avoid-Frequent-Thread-Switching" class="headerlink" title="7.2 Avoid Frequent Thread Switching"></a>7.2 Avoid Frequent Thread Switching</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Bad practice: frequent thread switching</span></span><br><span class="line">TCoroutine&lt;&gt; <span class="built_in">BadExample</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">co_await</span> UE5Coro::Async::<span class="built_in">MoveToTask</span>();</span><br><span class="line">        <span class="built_in">DoSmallWork</span>(i);</span><br><span class="line">        <span class="keyword">co_await</span> UE5Coro::Async::<span class="built_in">MoveToGameThread</span>();</span><br><span class="line">        <span class="built_in">UpdateUI</span>(i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Good practice: batch processing</span></span><br><span class="line">TCoroutine&lt;&gt; <span class="built_in">GoodExample</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Batch process on background thread</span></span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Async::<span class="built_in">MoveToTask</span>();</span><br><span class="line">    TArray&lt;FResult&gt; Results;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        Results.<span class="built_in">Add</span>(<span class="built_in">DoSmallWork</span>(i));</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Return to game thread for batch UI updates</span></span><br><span class="line">    <span class="keyword">co_await</span> UE5Coro::Async::<span class="built_in">MoveToGameThread</span>();</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; Result : Results)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">UpdateUI</span>(Result);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-3-Proper-Use-of-Cancellation-Mechanism"><a href="#7-3-Proper-Use-of-Cancellation-Mechanism" class="headerlink" title="7.3 Proper Use of Cancellation Mechanism"></a>7.3 Proper Use of Cancellation Mechanism</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Cancelable long-running coroutine</span></span><br><span class="line">TCoroutine&lt;&gt; <span class="built_in">CancelableTask</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000000</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Periodically check cancellation status</span></span><br><span class="line">        <span class="keyword">if</span> (i % <span class="number">1000</span> == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">co_await</span> UE5Coro::Latent::<span class="built_in">NextTick</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">DoWork</span>(i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Usage example</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">StartCancelableWork</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> Task = <span class="built_in">CancelableTask</span>();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Cancel task after 5 seconds</span></span><br><span class="line">    <span class="built_in">GetWorld</span>()-&gt;<span class="built_in">GetTimerManager</span>().<span class="built_in">SetTimer</span>(TimerHandle, [Task]()</span><br><span class="line">    &#123;</span><br><span class="line">        Task.<span class="built_in">Cancel</span>();</span><br><span class="line">    &#125;, <span class="number">5.0f</span>, <span class="literal">false</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="8-Engineering-Practice-Guide"><a href="#8-Engineering-Practice-Guide" class="headerlink" title="8. Engineering Practice Guide"></a>8. Engineering Practice Guide</h2><h3 id="8-1-Best-Practices"><a href="#8-1-Best-Practices" class="headerlink" title="8.1 Best Practices"></a>8.1 Best Practices</h3><ol>
+<li><strong>Choose appropriate coroutine types</strong>: Select latent or async coroutines based on use case</li>
+<li><strong>Proper use of co_await</strong>: Suspend coroutines at appropriate points to avoid blocking main thread</li>
+<li><strong>Resource management</strong>: Ensure proper resource cleanup when coroutines end</li>
+<li><strong>Exception handling</strong>: Handle exceptions properly in coroutines</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Good coroutine practice example</span></span><br><span class="line">TCoroutine&lt;&gt; <span class="built_in">ProcessLargeDataSet</span>(<span class="type">const</span> TArray&lt;FData&gt;&amp; DataSet)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">const</span> int32 BatchSize = <span class="number">100</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (int32 i = <span class="number">0</span>; i &lt; DataSet.<span class="built_in">Num</span>(); i += BatchSize)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Process a batch of data</span></span><br><span class="line">        int32 EndIndex = FMath::<span class="built_in">Min</span>(i + BatchSize, DataSet.<span class="built_in">Num</span>());</span><br><span class="line">        <span class="keyword">for</span> (int32 j = i; j &lt; EndIndex; ++j)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">ProcessSingleData</span>(DataSet[j]);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Yield control after processing each batch</span></span><br><span class="line">        <span class="keyword">co_await</span> UE5Coro::Latent::<span class="built_in">NextTick</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Large dataset processing completed&quot;</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-2-Debugging-Techniques"><a href="#8-2-Debugging-Techniques" class="headerlink" title="8.2 Debugging Techniques"></a>8.2 Debugging Techniques</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Using built-in debugging features</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">DebugCoroutineState</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> MyCoroutine = <span class="built_in">ExampleCoroutine</span>();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Check coroutine state</span></span><br><span class="line">    <span class="keyword">if</span> (MyCoroutine.<span class="built_in">IsDone</span>())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Coroutine completed&quot;</span>));</span><br><span class="line">        <span class="keyword">if</span> (MyCoroutine.<span class="built_in">WasSuccessful</span>())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">UE_LOG</span>(LogTemp, Log, <span class="built_in">TEXT</span>(<span class="string">&quot;Coroutine completed successfully&quot;</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Wait for coroutine completion (with timeout)</span></span><br><span class="line">    <span class="type">bool</span> bCompleted = MyCoroutine.<span class="built_in">Wait</span>(<span class="number">5000</span>); <span class="comment">// Wait 5 seconds</span></span><br><span class="line">    <span class="keyword">if</span> (!bCompleted)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">UE_LOG</span>(LogTemp, Warning, <span class="built_in">TEXT</span>(<span class="string">&quot;Coroutine execution timeout&quot;</span>));</span><br><span class="line">        MyCoroutine.<span class="built_in">Cancel</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-3-Error-Handling"><a href="#8-3-Error-Handling" class="headerlink" title="8.3 Error Handling"></a>8.3 Error Handling</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Error handling in coroutines</span></span><br><span class="line"><span class="function">TCoroutine&lt;<span class="type">bool</span>&gt; <span class="title">SafeAsyncOperation</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">try</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">co_await</span> UE5Coro::Latent::<span class="built_in">Seconds</span>(<span class="number">1.0f</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Potentially failing operation</span></span><br><span class="line">        <span class="type">bool</span> bSuccess = <span class="built_in">DoRiskyOperation</span>();</span><br><span class="line">        <span class="keyword">if</span> (!bSuccess)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">UE_LOG</span>(LogTemp, Error, <span class="built_in">TEXT</span>(<span class="string">&quot;Operation failed&quot;</span>));</span><br><span class="line">            <span class="keyword">co_return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">co_return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">catch</span> (<span class="type">const</span> std::exception&amp; e)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">UE_LOG</span>(LogTemp, Error, <span class="built_in">TEXT</span>(<span class="string">&quot;Coroutine exception: %s&quot;</span>), <span class="built_in">UTF8_TO_TCHAR</span>(e.<span class="built_in">what</span>()));</span><br><span class="line">        <span class="keyword">co_return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="9-Summary"><a href="#9-Summary" class="headerlink" title="9. Summary"></a>9. Summary</h2><p>The UE5Coro plugin elegantly integrates modern C++20 coroutine functionality into Unreal Engine 5, providing:</p>
+<ol>
+<li><strong>Type-safe coroutine system</strong>: Based on C++20 standard TCoroutine template class</li>
+<li><strong>Dual-layer Promise architecture</strong>: Separately handles latent and async execution modes</li>
+<li><strong>Deep engine integration</strong>: Seamless integration with UE5 lifecycle and Blueprint system</li>
+<li><strong>Rich Awaiter system</strong>: Supports time waiting, thread switching, condition polling, etc.</li>
+<li><strong>Complete cancellation mechanism</strong>: Supports graceful coroutine cancellation and resource cleanup</li>
+</ol>
+<p>This plugin provides UE5 developers with powerful asynchronous programming tools that can significantly improve game development efficiency and code maintainability. By properly using coroutines, developers can write clearer and more efficient asynchronous code, avoiding the traditional callback hell problem.</p>
+<h3 id="Key-Advantages"><a href="#Key-Advantages" class="headerlink" title="Key Advantages"></a>Key Advantages</h3><ul>
+<li><strong>Simplified async programming</strong>: Use co_await syntax instead of complex callback chains</li>
+<li><strong>Performance optimization</strong>: Avoid unnecessary thread blocking and context switching</li>
+<li><strong>Blueprint-friendly</strong>: Latent functions can be used directly in Blueprints</li>
+<li><strong>Type safety</strong>: Compile-time checking of coroutine types and return values</li>
+<li><strong>Resource management</strong>: Automatic handling of coroutine lifecycle and resource cleanup</li>
+</ul>
+<hr>
+<h2 id="Important-Notice-UE5-5-Linux-Compilation-Issues"><a href="#Important-Notice-UE5-5-Linux-Compilation-Issues" class="headerlink" title="Important Notice: UE5.5 Linux Compilation Issues"></a>Important Notice: UE5.5 Linux Compilation Issues</h2><p><strong>⚠️ Compilation Compatibility Warning</strong></p>
+<p>UE5Coro may encounter compilation errors in UE5.5 Linux environments:</p>
+<h3 id="Issue-Description"><a href="#Issue-Description" class="headerlink" title="Issue Description"></a>Issue Description</h3><ul>
+<li><strong>Error Type</strong>: Coroutine syntax parsing errors, Internal Compiler Error (ICE)</li>
+<li><strong>Related Links</strong>:<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/llvm/llvm-project/issues/91983">LLVM Project Issue #91983</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/landelare/ue5coro/issues/50">UE5Coro Project Issue #50</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="Root-Causes"><a href="#Root-Causes" class="headerlink" title="Root Causes"></a>Root Causes</h3><ol>
+<li><p><strong>Compiler Version Compatibility Issues</strong></p>
+<ul>
+<li>UE5Coro depends on C++20 coroutine features</li>
+<li>Some versions of MSVC&#x2F;Clang have incomplete coroutine support</li>
+<li>Compiler standard library implementation differences</li>
+</ul>
+</li>
+<li><p><strong>Specific Manifestations</strong></p>
+<ul>
+<li>Coroutine template instantiation failures</li>
+<li>Internal compiler errors causing compilation interruption</li>
+<li>Compatibility issues with specific Linux distributions and compiler combinations</li>
+</ul>
+</li>
+</ol>
+<hr>
+<p><em>This document is based on analysis of the UE5Coro plugin source code, covering core implementation mechanisms, usage methods, and best practices. Developers are recommended to adjust and optimize coroutine usage according to specific project requirements.</em></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+<script>
+// 等待页面加载完成
+document.addEventListener('DOMContentLoaded', function() {
+  // 查找现有的 utterances 脚本并移除
+  const existingScript = document.querySelector('script[src*="utteranc.es"]');
+  if (existingScript) {
+    existingScript.remove();
+  }
+  
+  // 查找现有的 utterances 容器并清空
+  const existingContainer = document.querySelector('.utterances-container, #utterances-container');
+  if (existingContainer) {
+    existingContainer.innerHTML = '';
+  }
+  
+  // 创建或复用评论容器
+  let commentsContainer = document.querySelector('.utterances-container, #utterances-container');
+  if (!commentsContainer) {
+    commentsContainer = document.createElement('div');
+    commentsContainer.className = 'comments utterances-container';
+    commentsContainer.id = 'utterances-container';
+    
+    // 找到合适的位置插入评论容器
+    const postBody = document.querySelector('.post-body') || document.querySelector('.content');
+    if (postBody) {
+      postBody.appendChild(commentsContainer);
+    } else {
+      document.body.appendChild(commentsContainer);
+    }
+  }
+  
+  // 创建 utterances 脚本
+  const script = document.createElement('script');
+  script.src = 'https://utteranc.es/client.js';
+  script.setAttribute('repo', 'qiuzijian7/qiuzijian7.github.io');
+  
+  // 使用 article_id 作为 issue-term，如果没有则回退到 title
+  
+  script.setAttribute('issue-term', 'ue5coro_analysis');
+  
+  
+  script.setAttribute('theme', 'github-light');
+  script.setAttribute('crossorigin', 'anonymous');
+  script.async = true;
+  
+  // 将脚本添加到容器中
+  commentsContainer.appendChild(script);
+});
+
+// 如果是 PJAX 环境，也需要在页面切换后重新加载评论
+if (typeof NexT !== 'undefined' && NexT.utils) {
+  document.addEventListener('page:loaded', function() {
+    // 延迟一点时间确保页面完全加载
+    setTimeout(function() {
+      const event = new Event('DOMContentLoaded');
+      document.dispatchEvent(event);
+    }, 100);
+  });
+}
+</script>
+
+          <div class="post-tags">
+              <a href="/tags/UE5/" rel="tag"># UE5</a>
+              <a href="/tags/C/" rel="tag"># C++</a>
+              <a href="/tags/Coroutines/" rel="tag"># Coroutines</a>
+              <a href="/tags/Async-Programming/" rel="tag"># Async Programming</a>
+              <a href="/tags/Source-Code-Analysis/" rel="tag"># Source Code Analysis</a>
+          </div>
+
+        
+
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+  <div class="languages">
+    <label class="lang-select-label">
+      <i class="fa fa-language"></i>
+      <span>简体中文</span>
+      <i class="fa fa-angle-up" aria-hidden="true"></i>
+    </label>
+    <select class="lang-select" data-canonical="" aria-label="Select language">
+      
+        <option value="zh-CN" data-href="/2025/09/29/ue5coro_analysis.en/" selected="">
+          简体中文
+        </option>
+      
+        <option value="en" data-href="/en/2025/09/29/ue5coro_analysis.en/" selected="">
+          English
+        </option>
+      
+    </select>
+  </div>
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">bugmaker</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<!-- 自定义语言切换器 -->
+<div class="language-switcher">
+  <a href="javascript:void(0)" onclick="switchLanguage('zh-CN')" id="lang-zh">中文</a>
+  <span class="separator">|</span>
+  <a href="javascript:void(0)" onclick="switchLanguage('en')" id="lang-en">EN</a>
+</div>
+
+<script>
+// 语言切换功能
+function switchLanguage(lang) {
+  const currentPath = window.location.pathname;
+  let newPath;
+  
+  console.log('Current path:', currentPath, 'Target lang:', lang);
+  // 保存用户选择的语言偏好
+  try { localStorage.setItem('language-preference', (lang === 'en') ? 'en' : 'zh-CN'); } catch (e) {}
+  
+  // 检测当前页面语言
+  const isCurrentlyEnglish = currentPath.includes('.en/') || currentPath.startsWith('/en/');
+  
+  if (lang === 'en') {
+    // 切换到英文
+    if (isCurrentlyEnglish) {
+      console.log('Already on English page');
+      return;
+    }
+    
+    if (currentPath === '/') {
+      // 首页：/ -> /en/
+      newPath = '/en/';
+    } else if (currentPath.match(/\/\d{4}\/\d{2}\/\d{2}\/[\w-]+\/$/)) {
+      // 文章页面：/2025/09/21/hello-world/ -> /2025/09/21/hello-world.en/
+      const articlePath = currentPath.slice(0, -1); // 移除末尾的 /
+      newPath = articlePath + '.en/';
+    } else if (currentPath.match(/^\/(about|tags|categories|archives)\//)) {
+      // 其他页面：/about/ -> /en/about/
+      newPath = '/en' + currentPath;
+    } else {
+      // 默认处理
+      newPath = '/en' + currentPath;
+    }
+  } else {
+    // 切换到中文
+    if (!isCurrentlyEnglish) {
+      console.log('Already on Chinese page');
+      return;
+    }
+    
+    if (currentPath === '/en/') {
+      // 英文首页：/en/ -> /
+      newPath = '/';
+    } else if (currentPath.match(/\/\d{4}\/\d{2}\/\d{2}\/[\w-]+\.en\/$/)) {
+      // 英文文章：/2025/09/21/hello-world.en/ -> /2025/09/21/hello-world/
+      newPath = currentPath.replace('.en/', '/');
+    } else if (currentPath.startsWith('/en/')) {
+      // 其他英文页面：/en/about/ -> /about/
+      newPath = currentPath.replace('/en', '');
+    }
+  }
+  
+  if (newPath) {
+    console.log('Switching from:', currentPath, 'to:', newPath);
+    // 直接跳转，不再检查页面存在性以避免延迟
+    window.location.href = newPath;
+  }
+}
+
+// 检测当前语言并高亮对应按钮
+function detectCurrentLanguage() {
+  const path = window.location.pathname;
+  // 修复语言检测逻辑
+  const isEnglish = path.includes('.en/') || path.startsWith('/en/');
+  
+  console.log('Detecting language for path:', path, 'isEnglish:', isEnglish);
+  
+  const zhBtn = document.getElementById('lang-zh');
+  const enBtn = document.getElementById('lang-en');
+  
+  if (zhBtn && enBtn) {
+    // 清除之前的状态
+    zhBtn.classList.remove('active');
+    enBtn.classList.remove('active');
+    
+    // 设置正确的状态
+    if (isEnglish) {
+      enBtn.classList.add('active');
+    } else {
+      zhBtn.classList.add('active');
+    }
+  }
+}
+
+// 检查并应用保存的语言偏好（不跳转，仅重写站内链接以保持语言一致）
+function applyLanguagePreference() {
+  let savedLanguage = null;
+  try { savedLanguage = localStorage.getItem('language-preference'); } catch (e) {}
+  if (savedLanguage) ensureLinksLanguage(savedLanguage);
+}
+
+// 统一将站内链接重写为指定语言版本（不触发跳转）
+// 规则：
+// - EN: / -> /en/；/about 等 => /en/about；文章路径 /YYYY/MM/DD/slug/ => 加 .en/
+// - ZH: /en/... => 去掉 /en 前缀；文章路径去掉 .en/
+function ensureLinksLanguage(lang) {
+  try {
+    var links = document.querySelectorAll('a[href]');
+    var origin = window.location.origin;
+    var articleZh = /^\/\d{4}\/\d{2}\/\d{2}\/[\w-]+\/$/;
+    var articleEn = /^\/\d{4}\/\d{2}\/\d{2}\/[\w-]+\.en\/$/;
+    var sections = /^(\/(about|tags|categories|archives)\/.*|\/(about|tags|categories|archives)\/?)$/;
+
+    links.forEach(function(a) {
+      var href = a.getAttribute('href');
+      if (!href) return;
+
+      // 仅处理同站内绝对路径链接
+      if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//')) return;
+      if (!href.startsWith('/')) return;
+
+      var newHref = href;
+
+      if (lang === 'en') {
+        if (href === '/') {
+          newHref = '/en/';
+        } else if (href.startsWith('/en/')) {
+          // 已经是英文
+          newHref = href;
+        } else if (articleZh.test(href)) {
+          // 文章：/..../slug/ -> /..../slug.en/
+          newHref = href.slice(0, -1) + '.en/';
+        } else if (sections.test(href)) {
+          // 章节页：/about -> /en/about
+          newHref = '/en' + (href.startsWith('/') ? href : '/' + href);
+        }
+      } else {
+        // zh-CN
+        if (href === '/en/') {
+          newHref = '/';
+        } else if (href.startsWith('/en/')) {
+          // 章节页去掉前缀
+          newHref = href.replace(/^\/en/, '');
+          // 文章：/..../slug.en/ -> /..../slug/
+          if (articleEn.test(href)) {
+            newHref = newHref.replace(/\.en\/$/, '/');
+          }
+        } else if (articleEn.test(href)) {
+          // 直接把 .en/ 去掉
+          newHref = href.replace(/\.en\/$/, '/');
+        }
+      }
+
+      if (newHref !== href) {
+        a.setAttribute('href', newHref);
+      }
+    });
+  } catch (e) {
+    console.warn('ensureLinksLanguage error:', e);
+  }
+}
+
+// 页面加载完成后执行
+document.addEventListener('DOMContentLoaded', function() {
+  detectCurrentLanguage();
+  applyLanguagePreference();
+});
+
+// 监听浏览器历史导航（返回/前进按钮）：仅更新高亮和重写链接，不做跳转
+window.addEventListener('popstate', function() {
+  setTimeout(function() {
+    detectCurrentLanguage();
+    applyLanguagePreference();
+  }, 60);
+});
+
+// 如果是NexT主题的pjax，也需要在页面切换后执行：仅更新高亮和重写链接
+if (typeof NexT !== 'undefined') {
+  document.addEventListener('page:loaded', function() {
+    detectCurrentLanguage();
+    applyLanguagePreference();
+  });
+}
+</script>
+</body>
+</html>

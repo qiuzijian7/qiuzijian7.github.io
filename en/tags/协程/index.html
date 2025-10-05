@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"qiuzijian7.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":false,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="一个专注于技术分享和个人成长的博客，涵盖UE、游戏设计、AI等内容A blog focused on tech sharing and personal growth, covering UE, game design, AI, and more.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bugmaker&#39;s Blog">
+<meta property="og:url" content="https://qiuzijian7.github.io/en/tags/%E5%8D%8F%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Bugmaker&#39;s Blog">
+<meta property="og:description" content="一个专注于技术分享和个人成长的博客，涵盖UE、游戏设计、AI等内容A blog focused on tech sharing and personal growth, covering UE, game design, AI, and more.">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="bugmaker">
+<meta property="article:tag" content="UE4,UE5,godot,C++,AI,n8n,gamedesign">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://qiuzijian7.github.io/en/tags/%E5%8D%8F%E7%A8%8B/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":false,"lang":"en","comments":"","permalink":"","path":"en/tags/协程/index.html","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Tag: 协程 | Bugmaker's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<!-- 自定义语言切换器样式 -->
+<style>
+.language-switcher {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 5px 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  backdrop-filter: blur(10px);
+}
+
+.language-switcher a {
+  color: #333;
+  text-decoration: none;
+  padding: 5px 8px;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.language-switcher a:hover {
+  background: #007acc;
+  color: white;
+}
+
+.language-switcher a.active {
+  background: #007acc;
+  color: white;
+}
+
+.language-switcher .separator {
+  color: #ccc;
+  margin: 0 3px;
+}
+
+/* 暗色模式适配 */
+.dark-mode .language-switcher {
+  background: rgba(0, 0, 0, 0.8);
+  border-color: #444;
+}
+
+.dark-mode .language-switcher a {
+  color: #fff;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .language-switcher {
+    top: 10px;
+    right: 10px;
+    padding: 3px 8px;
+  }
+  
+  .language-switcher a {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+}
+</style>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Bugmaker's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">分享技术，记录成长<br>Sharing Technology, Recording Growth</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="bugmaker"
+      src="/images/person.webp">
+  <p class="site-author-name" itemprop="name">bugmaker</p>
+  <div class="site-description" itemprop="description">  一个专注于技术分享和个人成长的博客，涵盖UE、游戏设计、AI等内容<br>A blog focused on tech sharing and personal growth, covering UE, game design, AI, and more.</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/qiuzijian7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;qiuzijian7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:919868412@qq.com" title="E-Mail → mailto:919868412@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/bugmaker-24" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;bugmaker-24" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i>知乎</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner tag posts-collapse">
+
+
+  
+  
+  
+  <div class="post-block">
+    <div class="post-content">
+      <div class="collection-title">
+        <h1 class="collection-header">协程
+          <small>Tag</small>
+        </h1>
+      </div>
+
+      
+    <div class="collection-year">
+      <span class="collection-header">2025</span>
+    </div>
+
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+      <div class="post-meta-container">
+        <time itemprop="dateCreated"
+              datetime="2025-09-29T17:00:00+08:00"
+              content="2025-09-29">
+          09-29
+        </time>
+      </div>
+
+      <div class="post-title">
+          <a class="post-title-link" href="/2025/09/29/ue5coro_analysis/" itemprop="url">
+            <span itemprop="name">UE5Coro协程插件深度技术解析</span>
+          </a>
+      </div>
+
+      
+    </header>
+  </article>
+
+    </div>
+  </div>
+  
+  
+  
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+  <div class="languages">
+    <label class="lang-select-label">
+      <i class="fa fa-language"></i>
+      <span>English</span>
+      <i class="fa fa-angle-up" aria-hidden="true"></i>
+    </label>
+    <select class="lang-select" data-canonical="" aria-label="Select language">
+      
+        <option value="zh-CN" data-href="/tags/%E5%8D%8F%E7%A8%8B/index.html" selected="">
+          简体中文
+        </option>
+      
+        <option value="en" data-href="/en/tags/%E5%8D%8F%E7%A8%8B/index.html" selected="">
+          English
+        </option>
+      
+    </select>
+  </div>
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">bugmaker</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<!-- 自定义语言切换器 -->
+<div class="language-switcher">
+  <a href="javascript:void(0)" onclick="switchLanguage('zh-CN')" id="lang-zh">中文</a>
+  <span class="separator">|</span>
+  <a href="javascript:void(0)" onclick="switchLanguage('en')" id="lang-en">EN</a>
+</div>
+
+<script>
+// 语言切换功能
+function switchLanguage(lang) {
+  const currentPath = window.location.pathname;
+  let newPath;
+  
+  console.log('Current path:', currentPath, 'Target lang:', lang);
+  // 保存用户选择的语言偏好
+  try { localStorage.setItem('language-preference', (lang === 'en') ? 'en' : 'zh-CN'); } catch (e) {}
+  
+  // 检测当前页面语言
+  const isCurrentlyEnglish = currentPath.includes('.en/') || currentPath.startsWith('/en/');
+  
+  if (lang === 'en') {
+    // 切换到英文
+    if (isCurrentlyEnglish) {
+      console.log('Already on English page');
+      return;
+    }
+    
+    if (currentPath === '/') {
+      // 首页：/ -> /en/
+      newPath = '/en/';
+    } else if (currentPath.match(/\/\d{4}\/\d{2}\/\d{2}\/[\w-]+\/$/)) {
+      // 文章页面：/2025/09/21/hello-world/ -> /2025/09/21/hello-world.en/
+      const articlePath = currentPath.slice(0, -1); // 移除末尾的 /
+      newPath = articlePath + '.en/';
+    } else if (currentPath.match(/^\/(about|tags|categories|archives)\//)) {
+      // 其他页面：/about/ -> /en/about/
+      newPath = '/en' + currentPath;
+    } else {
+      // 默认处理
+      newPath = '/en' + currentPath;
+    }
+  } else {
+    // 切换到中文
+    if (!isCurrentlyEnglish) {
+      console.log('Already on Chinese page');
+      return;
+    }
+    
+    if (currentPath === '/en/') {
+      // 英文首页：/en/ -> /
+      newPath = '/';
+    } else if (currentPath.match(/\/\d{4}\/\d{2}\/\d{2}\/[\w-]+\.en\/$/)) {
+      // 英文文章：/2025/09/21/hello-world.en/ -> /2025/09/21/hello-world/
+      newPath = currentPath.replace('.en/', '/');
+    } else if (currentPath.startsWith('/en/')) {
+      // 其他英文页面：/en/about/ -> /about/
+      newPath = currentPath.replace('/en', '');
+    }
+  }
+  
+  if (newPath) {
+    console.log('Switching from:', currentPath, 'to:', newPath);
+    // 直接跳转，不再检查页面存在性以避免延迟
+    window.location.href = newPath;
+  }
+}
+
+// 检测当前语言并高亮对应按钮
+function detectCurrentLanguage() {
+  const path = window.location.pathname;
+  // 修复语言检测逻辑
+  const isEnglish = path.includes('.en/') || path.startsWith('/en/');
+  
+  console.log('Detecting language for path:', path, 'isEnglish:', isEnglish);
+  
+  const zhBtn = document.getElementById('lang-zh');
+  const enBtn = document.getElementById('lang-en');
+  
+  if (zhBtn && enBtn) {
+    // 清除之前的状态
+    zhBtn.classList.remove('active');
+    enBtn.classList.remove('active');
+    
+    // 设置正确的状态
+    if (isEnglish) {
+      enBtn.classList.add('active');
+    } else {
+      zhBtn.classList.add('active');
+    }
+  }
+}
+
+// 检查并应用保存的语言偏好（不跳转，仅重写站内链接以保持语言一致）
+function applyLanguagePreference() {
+  let savedLanguage = null;
+  try { savedLanguage = localStorage.getItem('language-preference'); } catch (e) {}
+  if (savedLanguage) ensureLinksLanguage(savedLanguage);
+}
+
+// 统一将站内链接重写为指定语言版本（不触发跳转）
+// 规则：
+// - EN: / -> /en/；/about 等 => /en/about；文章路径 /YYYY/MM/DD/slug/ => 加 .en/
+// - ZH: /en/... => 去掉 /en 前缀；文章路径去掉 .en/
+function ensureLinksLanguage(lang) {
+  try {
+    var links = document.querySelectorAll('a[href]');
+    var origin = window.location.origin;
+    var articleZh = /^\/\d{4}\/\d{2}\/\d{2}\/[\w-]+\/$/;
+    var articleEn = /^\/\d{4}\/\d{2}\/\d{2}\/[\w-]+\.en\/$/;
+    var sections = /^(\/(about|tags|categories|archives)\/.*|\/(about|tags|categories|archives)\/?)$/;
+
+    links.forEach(function(a) {
+      var href = a.getAttribute('href');
+      if (!href) return;
+
+      // 仅处理同站内绝对路径链接
+      if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//')) return;
+      if (!href.startsWith('/')) return;
+
+      var newHref = href;
+
+      if (lang === 'en') {
+        if (href === '/') {
+          newHref = '/en/';
+        } else if (href.startsWith('/en/')) {
+          // 已经是英文
+          newHref = href;
+        } else if (articleZh.test(href)) {
+          // 文章：/..../slug/ -> /..../slug.en/
+          newHref = href.slice(0, -1) + '.en/';
+        } else if (sections.test(href)) {
+          // 章节页：/about -> /en/about
+          newHref = '/en' + (href.startsWith('/') ? href : '/' + href);
+        }
+      } else {
+        // zh-CN
+        if (href === '/en/') {
+          newHref = '/';
+        } else if (href.startsWith('/en/')) {
+          // 章节页去掉前缀
+          newHref = href.replace(/^\/en/, '');
+          // 文章：/..../slug.en/ -> /..../slug/
+          if (articleEn.test(href)) {
+            newHref = newHref.replace(/\.en\/$/, '/');
+          }
+        } else if (articleEn.test(href)) {
+          // 直接把 .en/ 去掉
+          newHref = href.replace(/\.en\/$/, '/');
+        }
+      }
+
+      if (newHref !== href) {
+        a.setAttribute('href', newHref);
+      }
+    });
+  } catch (e) {
+    console.warn('ensureLinksLanguage error:', e);
+  }
+}
+
+// 页面加载完成后执行
+document.addEventListener('DOMContentLoaded', function() {
+  detectCurrentLanguage();
+  applyLanguagePreference();
+});
+
+// 监听浏览器历史导航（返回/前进按钮）：仅更新高亮和重写链接，不做跳转
+window.addEventListener('popstate', function() {
+  setTimeout(function() {
+    detectCurrentLanguage();
+    applyLanguagePreference();
+  }, 60);
+});
+
+// 如果是NexT主题的pjax，也需要在页面切换后执行：仅更新高亮和重写链接
+if (typeof NexT !== 'undefined') {
+  document.addEventListener('page:loaded', function() {
+    detectCurrentLanguage();
+    applyLanguagePreference();
+  });
+}
+</script>
+</body>
+</html>
